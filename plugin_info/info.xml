@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<info>
+    <id>racoon</id>
+    <name>Racoon</name>
+    <description>Plugin Racoon</description>
+    <licence></licence>
+    <author>Odesen</author>
+    <require>2</require>
+    <category></category>
+</info>
+
