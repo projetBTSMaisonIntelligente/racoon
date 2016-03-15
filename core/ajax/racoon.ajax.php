@@ -41,7 +41,7 @@ try {
     //Lors de la sauvegarde de la configuration sur la page configuration.php 
     //Appel de la fonction ajouter objet
     if (init('action') == 'postSave') {
-        $return = raccon::ajouterZoneRadiateur();
+        $return = racoon::ajouterZoneRadiateur();
         ajax::success($return);
      }
 

@@ -22,11 +22,11 @@ require_once dirname(__FILE__) . '/../../core/php/phpSpark.class.php';
 
 class racoon extends eqLogic {
     /*     * *************************Attributs****************************** */
-    const CONFORT = "C";
-    const ECONOMIQUE = "E";
-    const HORSGEL = "H";
-    const ARRET = "A";
-    const NOMBRE_FILPILOTE = 7;
+    //const CONFORT = "C";
+    //const ECONOMIQUE = "E";
+    //const HORSGEL = "H";
+    //const ARRET = "A";
+    //const NOMBRE_FILPILOTE = 7;
 
 
     /*     * ***********************Methode static*************************** */
@@ -70,7 +70,25 @@ class racoon extends eqLogic {
       $spark->setAccessToken($accessToken);
       $spark->setTimeout("5");
       if ($spark->getVariable($deviceId,"etatfp") == true) {
-        #
+        $obj = $spark->getResult();
+        $result = $obj['result'];
+      } else {
+          log::add('racoon','error','erreur d\'appel de la variable etatfp,' . $spark->getError() . ' source ' . $spark->getErrorSource());
+          return false;
+      }
+      log::add('racoon','debug','Retour' . print_r($result,true));
+      $izone = 0;
+      while ($izone <=6) {
+        $izone++;
+        $sparkzone = $izone - 1;
+        $value = $result[$sparkzone];
+        $logical = 'zone' . $izone;
+        log::add('racoon','debug','Retour Status zone ' . $izone . ' valeur ' . $value);
+        $racoon = self::byLogicalId($logical, 'racoon');
+        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'status');
+        $racoonCmd->setConfiguration('value',$value);
+        $racoonCmd->save();
+        $racoonCmd->event($event);
       }
    }
 
@@ -87,7 +105,7 @@ class racoon extends eqLogic {
 
   public function racoonCall($zone,$request) {
      if(is_string($request) && is_int($zone)) {
-      if ( $zone >= 1 && $zone <=NOMBRE_FILPILOTE && ($request == ARRET || $request == HORSGEL || $request == ECONOMIQUE || $request == CONFORT)) {
+      if ( $zone >= 1 && $zone <=7 && ($request == 'A' || $request == 'H' || $request == 'E'|| $request == 'C')) {
         $params=$zone.$request;
         log::add('racoon','debug','Commande recu : ' . $request . 'vers la zone ' . $zone);
         //Récupération des données enregistrées dans la page de configuration
@@ -122,6 +140,7 @@ public static function ajouterZoneRadiateur() {
   $nbZone = 1;
 
     while ($nbZone <= 7) {
+      log::add('racoon','debug','Tentative de création de la zone ' . $nbZone);
       $logical = 'zone' . $nbZone;
       $racoon = self::byLogicalId($logical, 'racoon');
       if (!is_object($racoon)) {
@@ -136,12 +155,14 @@ public static function ajouterZoneRadiateur() {
         $racoon->setConfiguration('zone', $nbZone);
         $racoon->save();
         log::add('racoon', 'info',   print_r($racoon,true));
-        self::ajouterCmd('Confort','confort','action',CONFORT);
-        self::ajouterCmd('Eco','eco','action',ECONOMIQUE);
-        self::ajouterCmd('Hors Gel','horsgel','action',HORSGEL);
-        self::ajouterCmd('Arret','arret','action',ARRET);
-        self::ajouterCmd('Statut','statut','info',0);
+        self::ajouterCmd($racoon,'Confort','confort','action','C');
+        self::ajouterCmd($racoon,'Eco','eco','action','E');
+        self::ajouterCmd($racoon,'Hors Gel','horsgel','action','H');
+        self::ajouterCmd($racoon,'Arret','arret','action','A');
+        self::ajouterCmd($racoon,'Statut','statut','info',0);
       }
+      //incrémentation
+      $nbZone++;
   }
 }
    /**
@@ -150,9 +171,10 @@ public static function ajouterZoneRadiateur() {
      * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
-public static function ajouterCmd($nameCmd,$logicalIdCmd,$typeCmd,$request) {
+public static function ajouterCmd($racoon,$nameCmd,$logicalIdCmd,$typeCmd,$request) {
+  log::add('racoon','debug','tentative d\'ajout de cmd');
   $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),$logicalIdCmd);
-  if(!is_objet($racoonCmd)) {
+  if(!is_object($racoonCmd)) {
     $racoonCmd = new racoonCmd();
     $racoonCmd->setName($nameCmd);
     $racoonCmd->setEqLogic_id($racoon->getId());
@@ -162,21 +184,22 @@ public static function ajouterCmd($nameCmd,$logicalIdCmd,$typeCmd,$request) {
       case 'action':
         $racoonCmd->setType($typeCmd);
         $racoonCmd->setConfiguration('request',$request);
-        $projetRemoraCmd->setDisplay('generic_type','HEATING_OTHER');
+        $racoonCmd->SetSubType('other');
+        $racoonCmd->setDisplay('generic_type','HEATING_OTHER');
         break;
       
       case 'info':
         $racoonCmd->setType($typeCmd);
         $racoonCmd->setSubType('string');
         $racoonCmd->setEventOnly(1);
-        $projetRemoraCmd->setDisplay('generic_type','HEATING_STATE');
+        $racoonCmd->setDisplay('generic_type','HEATING_STATE');
         break;
 
      // default:
         
        // break;
     }
-    $racoon->save();
+    $racoonCmd->save();
 
   }
 

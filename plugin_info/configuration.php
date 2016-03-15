@@ -40,7 +40,7 @@ if (!isConnect()) {
       </div>
 
       <script>
-        function projetRemora_postSaveConfiguration(){
+        function racoon_postSaveConfiguration(){
             $.ajax({// fonction permettant de faire de l'ajax
             type: "POST", // methode de transmission des données au fichier php
             url: "plugins/racoon/core/ajax/racoon.ajax.php", // url du fichier php
