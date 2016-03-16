@@ -173,7 +173,7 @@ public static function ajouterZoneRadiateur() {
      *
      */
 public static function ajouterCmd($racoon,$nameCmd,$logicalIdCmd,$typeCmd,$request) {
-  log::add('racoon','debug','Ajout de la cmd ' . $nameCmd ' sur l\'equipement ' .$racoon->getLogicalId());
+  log::add('racoon','debug','Ajout de la cmd ' . $nameCmd . ' sur l\'equipement ' . $racoon->getLogicalId());
   $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),$logicalIdCmd);
   if(!is_object($racoonCmd)) {
     $racoonCmd = new racoonCmd();
