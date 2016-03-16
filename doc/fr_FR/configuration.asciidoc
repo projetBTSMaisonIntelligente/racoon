@@ -1,0 +1,5 @@
+== Configuration du plugin
+
+La configuration est très simple, après téléchargement du plugin, il vous suffit de l'activer et de rentrer l'ID de Spark Core et son access Token.
+
+

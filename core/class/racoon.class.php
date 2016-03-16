@@ -90,6 +90,7 @@ class racoon extends eqLogic {
         $racoonCmd->save();
         $racoonCmd->event($event);
       }
+      return true;
    }
 
    /**
@@ -127,6 +128,7 @@ class racoon extends eqLogic {
         //Enregistrement de l'état sur l'objet
       }
     }
+    return true;
 }
    /**
      * Création des objets composant le plugin
@@ -136,11 +138,9 @@ class racoon extends eqLogic {
      */
 public static function ajouterZoneRadiateur() {
   //ajout Radiateur
-  log::add('racoon','debug','Tentative de création des zones');
+  log::add('racoon','debug','Création des équipements');
   $nbZone = 1;
-
     while ($nbZone <= 7) {
-      log::add('racoon','debug','Tentative de création de la zone ' . $nbZone);
       $logical = 'zone' . $nbZone;
       $racoon = self::byLogicalId($logical, 'racoon');
       if (!is_object($racoon)) {
@@ -164,6 +164,7 @@ public static function ajouterZoneRadiateur() {
       //incrémentation
       $nbZone++;
   }
+  return true;
 }
    /**
      * Création des commandes composant le plugin
@@ -172,7 +173,7 @@ public static function ajouterZoneRadiateur() {
      *
      */
 public static function ajouterCmd($racoon,$nameCmd,$logicalIdCmd,$typeCmd,$request) {
-  log::add('racoon','debug','tentative d\'ajout de cmd');
+  log::add('racoon','debug','Ajout de la cmd ' . $nameCmd ' sur l\'equipement ' .$racoon->getLogicalId());
   $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),$logicalIdCmd);
   if(!is_object($racoonCmd)) {
     $racoonCmd = new racoonCmd();
@@ -202,7 +203,7 @@ public static function ajouterCmd($racoon,$nameCmd,$logicalIdCmd,$typeCmd,$reque
     $racoonCmd->save();
 
   }
-
+  return true;
 }
     /*     * *********************Méthodes d'instance************************* */
     /**
@@ -285,7 +286,7 @@ class racoonCmd extends cmd {
       $zone = $eqLogic->getConfiguration('zone');
       if ($zone == '0') {
         $izone = 1;
-        while ($izone <= NOMBRE_FILPILOTE) {
+        while ($izone <= 7) {
           racoon::racoonCall($izone,$request);
         }
       } else {
