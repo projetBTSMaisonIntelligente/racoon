@@ -34,7 +34,7 @@ class racoon extends eqLogic {
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom*/
       public static function cron() {
-          self::getStatus();
+          self::getStatut();
       }
     /* */
 
@@ -53,14 +53,14 @@ class racoon extends eqLogic {
       }
      */
    /**
-     * Récupération des status des zones des radiateurs de la maison.
+     * Récupération des statut des zones des radiateurs de la maison.
      *
      *
      * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
-   public function getStatus() {
-      log::add('racoon','debug','appel de getStatus()');
+   public function getStatut() {
+      log::add('racoon','debug','appel de getstatut()');
        //Récupération des données enregistrées dans la page de configuration
       $deviceId = config::byKey('deviceid','racoon',0);
       $accessToken = config::byKey('accessToken','racoon',0);
@@ -82,7 +82,7 @@ class racoon extends eqLogic {
         $sparkZone = $izone-1;
         $value = $result[$sparkZone];
         $logical = 'zone' . $izone;
-        log::add('racoon','debug','Retour Status zone ' . $izone . ' valeur ' . $value);
+        log::add('racoon','debug','Retour statut zone ' . $izone . ' valeur ' . $value);
         $racoon = self::byLogicalId($logical,'racoon');
         $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
         $racoonCmd->setConfiguration('value',$value);
@@ -109,7 +109,7 @@ class racoon extends eqLogic {
      if(is_string($request) && is_int($zone)) {
       if ( $zone >= 1 && $zone <=7 && ($request == 'A' || $request == 'H' || $request == 'E'|| $request == 'C')) {
         $params=$zone.$request;
-        log::add('racoon','debug','Commande recu : ' . $request . ' qvers la zone ' . $zone);
+        log::add('racoon','debug','Commande recu : ' . $request . '  vers la zone ' . $zone);
         //Récupération des données enregistrées dans la page de configuration
         $deviceId = config::byKey('deviceid', 'racoon',0);
         $accessToken = config::byKey('accessToken','racoon',0);
@@ -151,7 +151,7 @@ public static function ajouterZoneRadiateur() {
       $logical = 'zone' . $nbZone;
       $racoon = self::byLogicalId($logical, 'racoon');
       if (!is_object($racoon)) {
-        log::add('racoon', 'info', 'Equipement n existe pas, création ' . $logical);
+        log::add('racoon', 'info', 'Equipement n existe pas, création en cours' . $logical);
         $racoon = new racoon();
         $racoon->setEqType_name('racoon');
         $racoon->setLogicalId($logical);
@@ -167,6 +167,9 @@ public static function ajouterZoneRadiateur() {
         self::ajouterCmd($racoon,'Hors Gel','horsgel','action','H');
         self::ajouterCmd($racoon,'Arret','arret','action','A');
         self::ajouterCmd($racoon,'Statut','statut','info',0);
+        log::add('racoon','debug','fin de la creation de l\'equipement')
+      } else {
+        log::add('racoon','debug','l\'equipement ' . $logical . ' existe déjà');
       }
       //incrémentation
       $nbZone++;
@@ -208,7 +211,10 @@ public static function ajouterCmd($racoon,$nameCmd,$logicalIdCmd,$typeCmd,$reque
        // break;
     }
     $racoonCmd->save();
-
+    log::add('racoon','debug','fin de la création de la commande')
+    return true;
+  } else {
+    log::add('racoon','debug','Commande déjà crée');
   }
   return true;
 }
