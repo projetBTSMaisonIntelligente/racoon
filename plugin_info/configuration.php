@@ -35,7 +35,7 @@ if (!isConnect()) {
       <div id="champ_token" class="form-group">
         <label class="col-lg-4 control-label">{{Token d'accès du Spark Core: }}</label>
         <div class="col-lg-4">
-          <input class="configKey form-control" data-l1key="token" style="margin-top:5px" placeholder="ex : 4025"/>
+          <input class="configKey form-control" data-l1key="accessToken" style="margin-top:5px" placeholder="ex : 4025"/>
         </div>
       </div>
 

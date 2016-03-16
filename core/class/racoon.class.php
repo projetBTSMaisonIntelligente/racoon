@@ -76,20 +76,21 @@ class racoon extends eqLogic {
           log::add('racoon','error','erreur d\'appel de la variable etatfp,' . $spark->getError() . ' source ' . $spark->getErrorSource());
           return false;
       }
-      log::add('racoon','debug','Retour' . print_r($result,true));
-      $izone = 0;
-      while ($izone <=6) {
-        $izone++;
-        $sparkzone = $izone - 1;
-        $value = $result[$sparkzone];
+      log::add('racoon','debug','Retour ' . print_r($result,true));
+      $izone = 1;
+      while ($izone <=7) {
+        $sparkZone = $izone-1;
+        $value = $result[$sparkZone];
         $logical = 'zone' . $izone;
         log::add('racoon','debug','Retour Status zone ' . $izone . ' valeur ' . $value);
-        $racoon = self::byLogicalId($logical, 'racoon');
-        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'status');
+        $racoon = self::byLogicalId($logical,'racoon');
+        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
         $racoonCmd->setConfiguration('value',$value);
         $racoonCmd->save();
-        $racoonCmd->event($event);
+        $racoonCmd->event($value);
+        $izone++;
       }
+        
       return true;
    }
 
@@ -108,10 +109,10 @@ class racoon extends eqLogic {
      if(is_string($request) && is_int($zone)) {
       if ( $zone >= 1 && $zone <=7 && ($request == 'A' || $request == 'H' || $request == 'E'|| $request == 'C')) {
         $params=$zone.$request;
-        log::add('racoon','debug','Commande recu : ' . $request . 'vers la zone ' . $zone);
+        log::add('racoon','debug','Commande recu : ' . $request . ' qvers la zone ' . $zone);
         //Récupération des données enregistrées dans la page de configuration
         $deviceId = config::byKey('deviceid', 'racoon',0);
-        $accessToken = config::byKey('token','racoon',0);
+        $accessToken = config::byKey('accessToken','racoon',0);
         //Création de l'objet phpSpark pour communiquer avec le Spark Core
         $spark = new phpSpark();
         $spark->setDebug(false);
@@ -126,6 +127,12 @@ class racoon extends eqLogic {
           return false;
         }
         //Enregistrement de l'état sur l'objet
+        $logical = 'zone' . $zone;
+        $racoon = self::byLogicalId($logical, 'racoon');
+        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
+        $racoonCmd->setConfiguration('value', $request);
+        $racoonCmd->save();
+        $racoonCmd->event($request);
       }
     }
     return true;
