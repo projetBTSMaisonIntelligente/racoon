@@ -3,7 +3,6 @@
 :icons:
 = Racoon =
 
-
 == Description ==
 Plugin Jeedom pour la gestion des radiateurs dans sa maison grâce à des fils pilote contrôlés par un Spark Core.
 
@@ -12,8 +11,8 @@ Plugin Jeedom pour la gestion des radiateurs dans sa maison grâce à des fils p
 *Page de configuration*
 
 image::../images/pageConfig.png[]
-*Device ID du Spark Core : Identifiant de l'appareil accessible sur https://build.particle.io/build/[Particle Build]
-**Token d'accès du Spark Core : Clé d'accès à l'appareil accessible sur https://build.particle.io/build/[Particle Build]
+*Device ID du Spark Core : Identifiant de l'appareil accessible sur https://build.particle.io/build/[Particle Build].
+*Token d'accès du Spark Core : Clé d'accès à l'appareil accessible sur https://build.particle.io/build/[Particle Build].
 image::../images/idSparkCore.png[]
 image::../images/accessTokenSparkCore.png[]
 
@@ -21,10 +20,10 @@ image::../images/accessTokenSparkCore.png[]
 
 image::../images/pageGestionZone.png[]
 *Arrêt : Envoi d'un ordre arrêt dans la zone sélectionnée.
-**Confort : Envoi d'un ordre confort dans la zone sélectionnée.
-***Hors-gel : Envoi d'un ordre hors-gel dans la zone sélectionnée.
-****Eco : Envoi d'un ordre economique dans la zone sélectionnée.
-*****Statut : Permet de récupérer le statut de la zone sélectionnée.
+*Confort : Envoi d'un ordre confort dans la zone sélectionnée.
+*Hors-gel : Envoi d'un ordre hors-gel dans la zone sélectionnée.
+*Eco : Envoi d'un ordre economique dans la zone sélectionnée.
+*Statut : Permet de récupérer le statut de la zone sélectionnée.
 
 *Widget*
 
