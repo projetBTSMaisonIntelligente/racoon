@@ -61,9 +61,10 @@ class racoon extends eqLogic {
      */
    public function getStatut() {
       log::add('racoon','debug','appel de getstatut()');
-       //Récupération des données enregistrées dans la page de configuration
+      //Récupération des données enregistrées dans la page de configuration
       $deviceId = config::byKey('deviceid','racoon',0);
       $accessToken = config::byKey('accessToken','racoon',0);
+      //
       $spark = new phpSpark();
       $spark->setDebug(false);
       $spark->setDebugType("TXT");
@@ -80,17 +81,16 @@ class racoon extends eqLogic {
       $izone = 1;
       while ($izone <=7) {
         $sparkZone = $izone-1;
-        $value = $result[$sparkZone];
+        $statut = $result[$sparkZone];
         $logical = 'zone' . $izone;
-        log::add('racoon','debug','Retour statut zone ' . $izone . ' valeur ' . $value);
+        log::add('racoon','debug','Retour statut zone ' . $izone . ' valeur ' . $statut);
         $racoon = self::byLogicalId($logical,'racoon');
         $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
-        $racoonCmd->setConfiguration('value',$value);
+        $racoonCmd->setConfiguration('value',$statut);
         $racoonCmd->save();
-        $racoonCmd->event($value);
+        $racoonCmd->event($statut);
         $izone++;
       }
-        
       return true;
    }
 
@@ -143,6 +143,43 @@ class racoon extends eqLogic {
      * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
+   /**
+public function configSparkCore($accessToken) {
+        $spark = new phpSpark();
+        $spark->setDebug(false);
+        $spark->setDebugType("TXT");
+        $spark->setTimeout("5");
+        $spark->setAccessToken($accessToken);
+        return $spark;
+}**/
+
+
+   /**
+     * Sauvegarde du statut de la zone
+     *
+     * @param string $logicalId LogicalId nécessitant une mise à jour de sa data
+     *
+     * @param string $statut Statut de la zone à enregister 
+     *
+     * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
+     *
+     */
+   /**
+public function sauvegardeStatut($logicalId,$statut) {
+        $racoon = self::byLogicalId($logicalId, 'racoon');
+        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
+        $racoonCmd->setConfiguration('value', $statut);
+        $racoonCmd->save();
+        $racoonCmd->event($request);
+}**/
+
+
+   /**
+     * Création des objets composant le plugin
+     *
+     * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
+     *
+     */
 public static function ajouterZoneRadiateur() {
   //ajout Radiateur
   log::add('racoon','debug','Création des équipements');
@@ -178,6 +215,16 @@ public static function ajouterZoneRadiateur() {
 }
    /**
      * Création des commandes composant le plugin
+     *
+     * @param Racoon racoon Object racoon du plugin
+     *
+     * @param string $nameCmd Nom de la commande
+     *
+     * @param string $logicalIdCmd Nom de la logicalId pour la commande
+     *
+     * @param string $typeCmd Nom du type de commande
+     *
+     * @param string $request Ordre sélectionné par l'utilisateur
      *
      * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *

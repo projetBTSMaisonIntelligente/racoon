@@ -1,14 +1,30 @@
+[icon="./images/racoon_icon.png"]
+
 :icons:
-== Racoon
+Racoon
+======================
 
-=== Description
-Plugin 
+Description
+----------------------
+Plugin Jeedom pour la gestion des radiateurs dans sa maison grâce à des fils pilote contrôlés par un Spark Core.
 
-=== Configuration
+Gestion d'une zone :
+++++++++++++++++++++++
+image::./images/pageGestionZone.png[]
+
+Configuration
+~~~~~~~~~~~~~~~~~~~~~~
 include::configuration.asciidoc[]
 
-=== FAQ
+FAQ
+~~~~~~~~~~~~~~~~~~~~~~
 include::faq.asciidoc[]
 
-=== Troubleshoting
+Troubleshoting
+~~~~~~~~~~~~~~~~~~~~~~
 include::troubleshoting.asciidoc[]
+
+=== Gestion d'une zone :
+image::pageGestionZone.png[]
+
+
