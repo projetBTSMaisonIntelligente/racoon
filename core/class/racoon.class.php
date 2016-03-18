@@ -27,7 +27,7 @@ class racoon extends eqLogic {
     //const HORSGEL = "H";
     //const ARRET = "A";
     //const NOMBRE_FILPILOTE = 7;
-
+    $spark = new phpSpark();
 
     /*     * ***********************Methode static*************************** */
 
@@ -204,7 +204,7 @@ public static function ajouterZoneRadiateur() {
         self::ajouterCmd($racoon,'Hors Gel','horsgel','action','H');
         self::ajouterCmd($racoon,'Arret','arret','action','A');
         self::ajouterCmd($racoon,'Statut','statut','info',0);
-        log::add('racoon','debug','fin de la creation de l\'equipement')
+        log::add('racoon','debug','fin de la creation de l\'equipement');
       } else {
         log::add('racoon','debug','l\'equipement ' . $logical . ' existe déjà');
       }
