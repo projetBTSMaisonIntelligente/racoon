@@ -14,3 +14,9 @@ image::../images/pageConfig.PNG[]
 
 image::../images/idSparkCore.png[]
 image::../images/accessTokenSparkCore.png[]
+
+*Format fichier JSON pour les commandes et objets*
+
+Pour installer les différents objets et leurs commandes, suivre la syntaxe comme sur l'exemple ci-dessous.
+
+image::../images/CaptureJSON.png[]
