@@ -18,7 +18,11 @@
 
 /* * ***************************Includes********************************* */
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
-require_once dirname(__FILE__) . '/../../core/php/phpSpark.class.php';
+if(!class_exists("phpSpark"))
+{
+    require_once dirname(__FILE__) . '/../../core/php/phpSpark.class.php';
+}
+
 /**
      * Class racoon
      *
@@ -60,14 +64,14 @@ class racoon extends eqLogic {
      * @return array $objet|$commande selon le paramètre
      *
      */
-  public function recupererJSON($what)
+  public function recupererJSON($element)
   {
         if(file_get_contents(self::CHEMIN_FICHIERJSON) == TRUE) {
             log::add('racoon','debug','fichier JSON récupéré');
             $json_source = file_get_contents(self::CHEMIN_FICHIERJSON);
             if(json_decode($json_source,TRUE) == TRUE) {
               $data = json_decode($json_source,TRUE);
-              switch ($what) {
+              switch ($element) {
                 case 'objet':
                     $objet = $data['objet'];
                     return $objet;
@@ -93,7 +97,7 @@ class racoon extends eqLogic {
      * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
-    public function creationObjet() {
+    public static function creationObjet() {
       log::add('racoon','info','Création des objets');
         $objet = self::recupererJSON('objet');
         $nbObjet = count($objet);
@@ -119,7 +123,7 @@ class racoon extends eqLogic {
                   $racoon->setName($objet[$iObjet]['name']);
                   $racoon->setLogicalId($objet[$iObjet]['logicalId']);
                 } else {
-                  $racoon->setName($objet[$iObjet]['name'] . ($iNb + 1));
+                  $racoon->setName($objet[$iObjet]['name'] .  ' ' . ($iNb + 1));
                   $racoon->setLogicalId($objet[$iObjet]['logicalId'] . ($iNb + 1));
                 }
                 $racoon->setIsEnable($objet[$iObjet]['isEnable']);
@@ -152,7 +156,7 @@ class racoon extends eqLogic {
      * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
-    public function creationCommande($objetRacoon,$listeCommande,$tailleListeCommande)
+    public static function creationCommande($objetRacoon,$listeCommande,$tailleListeCommande)
     {
         log::add('racoon','info','Création des commandes pour l\'objet' . $objetRacoon->getName());
         $commande = self::recupererJSON('commande');
@@ -202,7 +206,7 @@ class racoon extends eqLogic {
      * @return boolean $bool 
      *
      */
-    public function checkConfig(){
+    public static function checkConfig(){
       $deviceId = config::byKey('deviceid','racoon',0);
       $accessToken = config::byKey('accessToken','racoon',0);
       $spark = new phpSpark();
@@ -270,6 +274,7 @@ class racoon extends eqLogic {
   public function racoonCall($zone,$request) {
         $params=$zone.$request;
         log::add('racoon','debug','Commande recu : ' . $request . '  vers la zone ' . $zone);
+
         //Récupération des données enregistrées dans la page de configuration
         $deviceId = config::byKey('deviceid', 'racoon',0);
         $accessToken = config::byKey('accessToken','racoon',0);
