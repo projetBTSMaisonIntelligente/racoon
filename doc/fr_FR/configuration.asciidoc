@@ -19,4 +19,4 @@ image::../images/accessTokenSparkCore.png[]
 
 Pour installer les différents objets et leurs commandes, suivre la syntaxe comme sur l'exemple ci-dessous.
 
-image::../images/CaptureJSON.png[]
+image::../images/CaptureJSON.PNG[]
