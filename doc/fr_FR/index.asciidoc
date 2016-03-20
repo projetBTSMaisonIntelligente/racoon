@@ -31,3 +31,7 @@ image::../images/pageGestionZone.png[]
 *Widget*
 
 image::../images/widget.PNG[]
+
+*Scénario*
+
+Possibilité d'associer des capteurs de température avec les zones de radiateur.
