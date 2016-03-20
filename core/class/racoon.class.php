@@ -19,44 +19,210 @@
 /* * ***************************Includes********************************* */
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 require_once dirname(__FILE__) . '/../../core/php/phpSpark.class.php';
-
+/**
+     * Class racoon
+     *
+     * @author Simon Desnoë <sdesnoe@gmail.com>
+     *
+     * @see https://www.jeedom.com/doc/documentation/code/classes/eqLogic.html Documentation de la Classe eqLogic
+     *
+     * @version 1.1
+     */
 class racoon extends eqLogic {
     /*     * *************************Attributs****************************** */
-    //const CONFORT = "C";
-    //const ECONOMIQUE = "E";
-    //const HORSGEL = "H";
-    //const ARRET = "A";
-    //const NOMBRE_FILPILOTE = 7;
-    $spark = new phpSpark();
+    const CONFORT = 'C';
+    const ECONOMIQUE = 'E';
+    const HORSGEL = 'H';
+    const ARRET = 'A';
+    const NOMBRE_MINI_FILPILOTE = 1;
+    const NOMBRE_FILPILOTE = 7;
+    const CHEMIN_FICHIERJSON = '/usr/share/nginx/www/jeedom/plugins/racoon/core/resources/objetEtCommande.json';
 
     /*     * ***********************Methode static*************************** */
 
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom*/
+    /**
+     * Méthode appelée par le système toutes les minutes
+     *
+     */
       public static function cron() {
           self::getStatut();
       }
-    /* */
 
-
-    /*
-     * Fonction exécutée automatiquement toutes les heures par Jeedom
-      public static function cronHourly() {
-
-      }
+  /**
+     * Configuration de l'objet Spark Core (utilisé dans les méthodes call et getStatut)
+     *
+     * @see https://secure.php.net/manual/fr/function.json-last-error.php Pour les codes d'erreur JSON
+     *
+     * @param string $what le nom du tableau à récuperer dans le fichier JSON, soit 'objet' pour récupérer tous les objets à créer soit toutes les commandes disponibles
+     *
+     * @return array $objet|$commande selon le paramètre
+     *
      */
+  public function recupererJSON($what)
+  {
+        if(file_get_contents(self::CHEMIN_FICHIERJSON) == TRUE) {
+            log::add('racoon','debug','fichier JSON récupéré');
+            $json_source = file_get_contents(self::CHEMIN_FICHIERJSON);
+            if(json_decode($json_source,TRUE) == TRUE) {
+              $data = json_decode($json_source,TRUE);
+              switch ($what) {
+                case 'objet':
+                    $objet = $data['objet'];
+                    return $objet;
+                    break;
+                case 'commande':
+                    $commande = $data['commande'];
+                    return $commande;
+                    break;
+              }
+            } else {
+              log::add('racoon','error','erreur dans le fichier JSON ' . json_last_error());
+            }
+        }
+        else {
+            log::add('racoon','error','fichier JSON introuvable');
+        }
+  }
 
-    /*
-     * Fonction exécutée automatiquement tous les jours par Jeedom
-      public static function cronDayly() {
-
-      }
+  /**
+     * Ajout de tous les objets du plugin appelé après la sauvegarde de la configuration
+     *
+     *
+     * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
+     *
      */
+    public function creationObjet() {
+      log::add('racoon','info','Création des objets');
+        $objet = self::recupererJSON('objet');
+        $nbObjet = count($objet);
+        //Premiere boucle pour les différents types d'objets
+        //le maximum est donc $nbObjet
+        for ($iObjet=0; $iObjet <$nbObjet; $iObjet++) { 
+          //Deuxieme boucle pour la quantité d'objet d'un type
+          //le maximum est donc $objet[$iObjet]['nombre']
+
+          $commande = $objet[$iObjet]['commande'];
+          $nbCommande = count($commande);
+
+           for ($iNb=0; $iNb < $objet[$iObjet]['nombre']; $iNb++) { 
+              if($objet[$iObjet]['nombre'] == 1) {
+                $racoon = self::byLogicalId($objet[$iObjet]['logicalId'], 'racoon');
+              } else {
+                $racoon = self::byLogicalId($objet[$iObjet]['logicalId'] . ($iNb + 1), 'racoon');
+              }
+              if(!is_object($racoon)) {
+                $racoon = new racoon();
+                $racoon->setEqType_name($objet[$iObjet]['eqType_name']);
+                if($objet[$iObjet]['nombre'] == 1) {
+                  $racoon->setName($objet[$iObjet]['name']);
+                  $racoon->setLogicalId($objet[$iObjet]['logicalId']);
+                } else {
+                  $racoon->setName($objet[$iObjet]['name'] . ($iNb + 1));
+                  $racoon->setLogicalId($objet[$iObjet]['logicalId'] . ($iNb + 1));
+                }
+                $racoon->setIsEnable($objet[$iObjet]['isEnable']);
+                if($objet[$iObjet]['configuration'][0]['value'] == 'iNb'){
+                  $racoon->setConfiguration($objet[$iObjet]['configuration'][0]['name'],($iNb +1));
+                } else {
+                  $racoon->setConfiguration($objet[$iObjet]['configuration'][0]['name'],$objet[$iObjet]['configuration'][0]['value']);
+                }
+                $racoon->save();
+                log::add('racoon', 'info',print_r($racoon,true));
+           } else {
+                log::add('racoon','debug','objet ' . $racoon->getName() .'déjà crée');
+           }
+           self::creationCommande($racoon,$objet[$iObjet]['commande'],$nbCommande);
+
+        }
+      }
+      return true;
+  } 
+
+  /**
+     * Création des commandes en fonction des objets
+     *
+     * @param racoon $racoon
+     *
+     * @param array $listeCommande liste des commandes pour l'objet racoon
+     *
+     * @param int $tailleListeCommande taille de la liste des commandes pour l'objet racoon
+     *
+     * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
+     *
+     */
+    public function creationCommande($objetRacoon,$listeCommande,$tailleListeCommande)
+    {
+        log::add('racoon','info','Création des commandes pour l\'objet' . $objetRacoon->getName());
+        $commande = self::recupererJSON('commande');
+        for ($nbCommande=0 ; $nbCommande < $tailleListeCommande ; $nbCommande++) { 
+            $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($objetRacoon->getId(),$listeCommande[$nbCommande]['name']);
+            if(!is_object($racoonCmd)) {
+                $racoonCmd = new racoonCmd();
+                $racoonCmd->setName($commande[$listeCommande[$nbCommande]['num']]['name']);
+                $racoonCmd->setEqLogic_id($objetRacoon->getId());
+                $racoonCmd->setEqType($commande[$listeCommande[$nbCommande]['num']]['eqType']);
+                $racoonCmd->setLogicalId($commande[$listeCommande[$nbCommande]['num']]['logicalId']);
+                $racoonCmd->setType($commande[$listeCommande[$nbCommande]['num']]['type']);
+                $racoonCmd->setConfiguration($commande[$listeCommande[$nbCommande]['num']]['configuration'][0]['name'],$commande[$listeCommande[$nbCommande]['num']]['configuration'][0]['value']);
+                $racoonCmd->SetSubType($commande[$listeCommande[$nbCommande]['num']]['subType']);
+                $racoonCmd->setDisplay('generic_type',$commande[$listeCommande[$nbCommande]['num']]['display']);
+                $racoonCmd->save();
+                log::add('racoon', 'info',   print_r($racoonCmd,true));
+            } else {
+              log::add('racoon','debug','Commande ' . $racoonCmd->getName() . 'déjà crée');
+            }
+        }
+        return true;
+    }
+
+  /**
+     * Configuration de l'objet Spark Core (utilisé dans les méthodes call et getStatut)
+     *
+     * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
+     *
+     * @param string $accessToken Variable correspondant à la clé d'accès du Spark Core reçu sur la page de configuration
+     *
+     * @return phpSpark $spark Objet de la librairie phpParticle
+     *
+     */
+    public function configurationSparkCore($accessToken){
+      $spark = new phpSpark();
+      $spark->setDebug(false);
+      $spark->setDebugType("TXT");
+      $spark->setAccessToken($accessToken);
+      $spark->setTimeout("5");
+      return $spark;
+    }
+
+    /**
+     * Vérifie les données sur la page de configuration 
+     *
+     * @return boolean $bool 
+     *
+     */
+    public function checkConfig(){
+      $deviceId = config::byKey('deviceid','racoon',0);
+      $accessToken = config::byKey('accessToken','racoon',0);
+      $spark = new phpSpark();
+      $spark->setDebug(true);
+      $spark->setDebugType("TXT");
+      $spark->setAccessToken($accessToken);
+      if($spark->signalDevice($deviceId,1) == true) {
+        $spark->debug_r($spark->getResult());
+      } else {
+        throw new Exception(__('La connexion avec le Spark Core n\'a pas été établi, vérifier les identifiants', __FILE__));
+      }
+      return TRUE;
+    }
+
    /**
      * Récupération des statut des zones des radiateurs de la maison.
      *
+     * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
      *
-     * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
+     * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
    public function getStatut() {
@@ -64,12 +230,7 @@ class racoon extends eqLogic {
       //Récupération des données enregistrées dans la page de configuration
       $deviceId = config::byKey('deviceid','racoon',0);
       $accessToken = config::byKey('accessToken','racoon',0);
-      //
-      $spark = new phpSpark();
-      $spark->setDebug(false);
-      $spark->setDebugType("TXT");
-      $spark->setAccessToken($accessToken);
-      $spark->setTimeout("5");
+      $spark = self::configurationSparkCore($accessToken);
       if ($spark->getVariable($deviceId,"etatfp") == true) {
         $obj = $spark->getResult();
         $result = $obj['result'];
@@ -78,15 +239,15 @@ class racoon extends eqLogic {
           return false;
       }
       log::add('racoon','debug','Retour ' . print_r($result,true));
-      $izone = 1;
-      while ($izone <=7) {
+      $izone = self::NOMBRE_MINI_FILPILOTE;
+      while ($izone <=self::NOMBRE_FILPILOTE) {
         $sparkZone = $izone-1;
         $statut = $result[$sparkZone];
         $logical = 'zone' . $izone;
         log::add('racoon','debug','Retour statut zone ' . $izone . ' valeur ' . $statut);
         $racoon = self::byLogicalId($logical,'racoon');
         $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
-        $racoonCmd->setConfiguration('value',$statut);
+        $racoonCmd->setConfiguration('statut',$statut);
         $racoonCmd->save();
         $racoonCmd->event($statut);
         $izone++;
@@ -97,28 +258,23 @@ class racoon extends eqLogic {
    /**
      * Envoi d'ordre $request à la zone $zone via requête HTTP par méthode POST pour les radiateurs.  
      *
+     * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
+     *
      * @param int $zone Variable correspondant au numéro de la zone sélectionnée.
      *
      * @param string $request Variable correspondant de la demande d'ordre.
      *
-     * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
+     * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
-
   public function racoonCall($zone,$request) {
-     if(is_string($request) && is_int($zone)) {
-      if ( $zone >= 1 && $zone <=7 && ($request == 'A' || $request == 'H' || $request == 'E'|| $request == 'C')) {
         $params=$zone.$request;
         log::add('racoon','debug','Commande recu : ' . $request . '  vers la zone ' . $zone);
         //Récupération des données enregistrées dans la page de configuration
         $deviceId = config::byKey('deviceid', 'racoon',0);
         $accessToken = config::byKey('accessToken','racoon',0);
         //Création de l'objet phpSpark pour communiquer avec le Spark Core
-        $spark = new phpSpark();
-        $spark->setDebug(false);
-        $spark->setDebugType("TXT");
-        $spark->setTimeout("5");
-        $spark->setAccessToken($accessToken);
+        $spark = self::configurationSparkCore($accessToken);
         //Appel de la fonction setfp avec les params
         if($spark->callFunction($deviceId,"setfp",$params) == true) {
           log::add('racoon','debug','Commande envoye au Spark Core');
@@ -130,141 +286,12 @@ class racoon extends eqLogic {
         $logical = 'zone' . $zone;
         $racoon = self::byLogicalId($logical, 'racoon');
         $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
-        $racoonCmd->setConfiguration('value', $request);
+        $racoonCmd->setConfiguration('statut', $request);
         $racoonCmd->save();
         $racoonCmd->event($request);
-      }
+        return true;
     }
-    return true;
-}
-   /**
-     * Création des objets composant le plugin
-     *
-     * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
-     *
-     */
-   /**
-public function configSparkCore($accessToken) {
-        $spark = new phpSpark();
-        $spark->setDebug(false);
-        $spark->setDebugType("TXT");
-        $spark->setTimeout("5");
-        $spark->setAccessToken($accessToken);
-        return $spark;
-}**/
-
-
-   /**
-     * Sauvegarde du statut de la zone
-     *
-     * @param string $logicalId LogicalId nécessitant une mise à jour de sa data
-     *
-     * @param string $statut Statut de la zone à enregister 
-     *
-     * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
-     *
-     */
-   /**
-public function sauvegardeStatut($logicalId,$statut) {
-        $racoon = self::byLogicalId($logicalId, 'racoon');
-        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
-        $racoonCmd->setConfiguration('value', $statut);
-        $racoonCmd->save();
-        $racoonCmd->event($request);
-}**/
-
-
-   /**
-     * Création des objets composant le plugin
-     *
-     * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
-     *
-     */
-public static function ajouterZoneRadiateur() {
-  //ajout Radiateur
-  log::add('racoon','debug','Création des équipements');
-  $nbZone = 1;
-    while ($nbZone <= 7) {
-      $logical = 'zone' . $nbZone;
-      $racoon = self::byLogicalId($logical, 'racoon');
-      if (!is_object($racoon)) {
-        log::add('racoon', 'info', 'Equipement n existe pas, création en cours' . $logical);
-        $racoon = new racoon();
-        $racoon->setEqType_name('racoon');
-        $racoon->setLogicalId($logical);
-        $racoon->setName('Zone ' . $nbZone);
-        $racoon->setIsEnable(true);
-        $racoon->save();
-        $racoon->setLogicalId('zone' . $nbZone);
-        $racoon->setConfiguration('zone', $nbZone);
-        $racoon->save();
-        log::add('racoon', 'info',   print_r($racoon,true));
-        self::ajouterCmd($racoon,'Confort','confort','action','C');
-        self::ajouterCmd($racoon,'Eco','eco','action','E');
-        self::ajouterCmd($racoon,'Hors Gel','horsgel','action','H');
-        self::ajouterCmd($racoon,'Arret','arret','action','A');
-        self::ajouterCmd($racoon,'Statut','statut','info',0);
-        log::add('racoon','debug','fin de la creation de l\'equipement');
-      } else {
-        log::add('racoon','debug','l\'equipement ' . $logical . ' existe déjà');
-      }
-      //incrémentation
-      $nbZone++;
-  }
-  return true;
-}
-   /**
-     * Création des commandes composant le plugin
-     *
-     * @param Racoon racoon Object racoon du plugin
-     *
-     * @param string $nameCmd Nom de la commande
-     *
-     * @param string $logicalIdCmd Nom de la logicalId pour la commande
-     *
-     * @param string $typeCmd Nom du type de commande
-     *
-     * @param string $request Ordre sélectionné par l'utilisateur
-     *
-     * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
-     *
-     */
-public static function ajouterCmd($racoon,$nameCmd,$logicalIdCmd,$typeCmd,$request) {
-  log::add('racoon','debug','Ajout de la cmd ' . $nameCmd . ' sur l\'equipement ' . $racoon->getLogicalId());
-  $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),$logicalIdCmd);
-  if(!is_object($racoonCmd)) {
-    $racoonCmd = new racoonCmd();
-    $racoonCmd->setName($nameCmd);
-    $racoonCmd->setEqLogic_id($racoon->getId());
-    $racoonCmd->setEqType('racoon');
-    $racoonCmd->setLogicalId($logicalIdCmd);
-    switch ($typeCmd) {
-      case 'action':
-        $racoonCmd->setType($typeCmd);
-        $racoonCmd->setConfiguration('request',$request);
-        $racoonCmd->SetSubType('other');
-        $racoonCmd->setDisplay('generic_type','HEATING_OTHER');
-        break;
-      
-      case 'info':
-        $racoonCmd->setType($typeCmd);
-        $racoonCmd->setSubType('string');
-        $racoonCmd->setEventOnly(1);
-        $racoonCmd->setDisplay('generic_type','HEATING_STATE');
-        break;
-
-     // default:
-        
-       // break;
-    }
-    $racoonCmd->save();
-    log::add('racoon','debug','fin de la création de la commande')
-    return true;
-  } else {
-    log::add('racoon','debug','Commande déjà crée');
-  }
-  return true;
-}
+   
     /*     * *********************Méthodes d'instance************************* */
     /**
 
@@ -300,33 +327,34 @@ public static function ajouterCmd($racoon,$nameCmd,$logicalIdCmd,$typeCmd,$reque
         
     }
     **/
-    /*
-     * Non obligatoire mais permet de modifier l'affichage du widget si vous en avez besoin
-      public function toHtml($_version = 'dashboard') {
-
-      }
-     */
 
     /*     * **********************Getteur Setteur*************************** */
 }
 
+/**
+     * Class racoonCmd
+     *
+     * @author Simon Desnoë <sdesnoe@gmail.com>
+     *
+     * @see https://www.jeedom.com/doc/documentation/code/classes/cmd.html Documentation de la Classe cmd
+     *
+     * @version 1.1
+     */
 class racoonCmd extends cmd {
     /*     * *************************Attributs****************************** */
 
+    const NOMBRE_MINI_FILPILOTE = 1;
+    const NOMBRE_FILPILOTE = 7;
 
     /*     * ***********************Methode static*************************** */
 
 
     /*     * *********************Methode d'instance************************* */
 
-    /*
-     * Non obligatoire permet de demander de ne pas supprimer les commandes même si elles ne sont pas dans la nouvelle configuration de l'équipement envoyé en JS
-      public function dontRemoveCmd() {
-      return true;
-      }
-     */
    /**
      * Permet l'execution des commandes associées aux objets selon les types de commandes.
+     *
+     * @param  $_options 
      *
      * @return boolean retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
@@ -334,7 +362,7 @@ class racoonCmd extends cmd {
     public function execute($_options = array()) {
       switch($this->getType()) {
         case 'info' :
-          return $this->getConfiguration('value');
+          return $this->getConfiguration('statut');
           break;
         case 'action' :
           $request = $this->getConfiguration('request');
@@ -345,9 +373,8 @@ class racoonCmd extends cmd {
       $logicalId = $this->getLogicalId();
       $zone = $eqLogic->getConfiguration('zone');
       if ($zone == '0') {
-        $izone = 1;
-        while ($izone <= 7) {
-          racoon::racoonCall($izone,$request);
+        for ($iZone=self::NOMBRE_MINI_FILPILOTE; $iZone <= self::NOMBRE_FILPILOTE ; $iZone++) { 
+          racoon::racoonCall($iZone,$request);
         }
       } else {
         racoon::racoonCall($zone,$request);

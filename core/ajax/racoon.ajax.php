@@ -23,7 +23,7 @@ try {
     if (!isConnect('admin')) {
         throw new Exception(__('401 - Accès non autorisé', __FILE__));
     }
-    
+    /**
     if (init('action') == 'getracoon') {
         $racoon = racoon::byId(init('id'));
         if (!is_object($racoon)) {
@@ -37,11 +37,16 @@ try {
             $return['cmd'][] = $cmd_info;
         }
         ajax::success($return);
-     }
+     }**/
     //Lors de la sauvegarde de la configuration sur la page configuration.php 
     //Appel de la fonction ajouter objet
     if (init('action') == 'postSave') {
-        $return = racoon::ajouterZoneRadiateur();
+        try {
+            racoon::checkConfig();
+        } catch (Exception $e) {
+            ajax::error(displayExeption($e), $e->getCode());
+        }
+        $return = racoon::creationObjet();
         ajax::success($return);
      }
 

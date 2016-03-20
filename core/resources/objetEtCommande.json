@@ -1,0 +1,107 @@
+{
+	"objet": [
+		{
+			"_comment": "objet du plugin Racoon, Zone",
+			"eqType_name":"racoon",
+			"commande": [
+				{"name" : "confort","num":"0"},
+				{"name" : "eco","num":"1"},
+				{"name" : "horsGel","num":"2"},
+				{"name" : "arret","num":"3"},
+				{"name" : "statut","num":"4"}
+			],
+			"name":"Zone", 
+			"nombre": "7",
+			"logicalId":"zone",
+			"isEnable":"1",
+			"configuration": [
+				{"name":"zone","value":"iNb"}
+			]
+		},
+		{
+			"_comment": "objet du plugin Raccon, Global",
+			"eqType_name":"racoon",
+			"commande": [
+				{"name" : "'confort'","num":"0"},
+				{"name" : "'eco'","num":"1"},
+				{"name" : "'horsGel'","num":"2"},
+				{"name" : "'arret'","num":"3"}
+			],
+			"name":"Global", 
+			"nombre":"1",
+			"logicalId":"global",
+			"isEnable":"1",
+			"configuration": [
+				{"name":"zone","value":"0"}
+			]
+		}
+	],
+	"commande": [
+		{
+			"_comment": "Commande du plugin Racoon, Confort",
+
+			"name":"Confort",
+			"eqType":"racoon",
+			"logicalId":"confort",
+			"type":"action",
+			"configuration": [
+				{"name": "request","value":"C"}
+			],
+			"subType":"other",
+			"display":"HEATING_ON",
+			"eventOnly":"1"
+		},
+		{
+			"_comment": "Commande du plugin Racoon, Eco",
+			"name":"Eco",
+			"eqType":"racoon",
+			"logicalId":"eco",
+			"type":"action",
+			"configuration": [
+				{"name": "request","value":"E"}
+			],
+			"subType":"other",
+			"display":"HEATING_OTHER",
+			"eventOnly":"1"
+		},
+		{
+			"_comment": "Commande du plugin Racoon, Hors-gel",
+			"name":"Hors Gel",
+			"eqType":"racoon",
+			"logicalId":"horsgel",
+			"type":"action",
+			"configuration": [
+				{"name": "request","value":"H"}
+			],
+			"subType":"other",
+			"display":"HEATING_OTHER",
+			"eventOnly":"1"
+		},
+		{
+			"_comment": "Commande du plugin Racoon, Arrêt",
+			"name":"Arrêt",
+			"eqType":"racoon",
+			"logicalId":"arret",
+			"type":"action",
+			"configuration": [
+				{"name": "request","value":"A"}
+			],
+			"subType":"other",
+			"display":"HEATING_OFF",
+			"eventOnly":"1"
+		},
+		{
+			"_comment": "Commande du plugin Racoon, Statut",
+			"name":"Statut",
+			"eqType":"racoon",
+			"logicalId":"statut",
+			"type":"info",
+			"configuration": [
+				{"name": "statut","value":"NULL"}
+			],
+			"subType":"string",
+			"display":"HEATING_STATE",
+			"eventOnly":"1"
+		}
+	]
+}
