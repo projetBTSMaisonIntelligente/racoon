@@ -41,11 +41,13 @@ try {
     //Lors de la sauvegarde de la configuration sur la page configuration.php 
     //Appel de la fonction ajouter objet
     if (init('action') == 'postSave') {
+        /**
         try {
             racoon::checkConfig();
         } catch (Exception $e) {
             ajax::error(displayExeption($e), $e->getCode());
         }
+        **/
         $return = racoon::creationObjet();
         ajax::success($return);
      }

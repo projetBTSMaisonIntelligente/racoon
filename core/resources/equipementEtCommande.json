@@ -1,7 +1,7 @@
 {
-	"objet": [
+	"equipement": [
 		{
-			"_comment": "objet du plugin Racoon, Zone",
+			"_comment": "equipement du plugin Racoon, Zone",
 			"eqType_name":"racoon",
 			"commande": [
 				{"name" : "confort","num":"0"},
@@ -19,7 +19,7 @@
 			]
 		},
 		{
-			"_comment": "objet du plugin Raccon, Global",
+			"_comment": "equipement du plugin Raccon, Global",
 			"eqType_name":"racoon",
 			"commande": [
 				{"name" : "'confort'","num":"0"},
@@ -33,6 +33,44 @@
 			"isEnable":"1",
 			"configuration": [
 				{"name":"zone","value":"0"}
+			]
+		},
+		{
+			"_comment": "equipement du plugin Racoon, Teleinfo",
+			"eqType_name":"racoon",
+			"commande": [
+				{"name" : "timestamp","num":"5"},
+				{"name" : "date","num":"6"},
+				{"name" : "heure","num":"7"},
+				{"name" : "iinst","num":"8"},
+				{"name" : "motdetat","num":"9"},
+				{"name" : "optarif","num":"10"},
+				{"name" : "isousc","num":"11"},
+				{"name" : "adco","num":"12"},
+				{"name" : "hchc","num":"13"},
+				{"name" : "hchp","num":"14"},
+				{"name" : "papp","num":"15"},
+				{"name" : "imax","num":"16"},
+				{"name" : "hhphc","num":"17"},
+				{"name" : "base","num":"18"},
+				{"name" : "bbrhcjb","num":"19"},
+				{"name" : "bbrhpjb","num":"20"},
+				{"name" : "bbrhcjw","num":"21"},
+				{"name" : "bbrhpjw","num":"22"},
+				{"name" : "bbrhcjr","num":"23"},
+				{"name" : "bbrhpjr","num":"24"},
+				{"name" : "ejphn","num":"25"},
+				{"name" : "ejphpm","num":"26"},
+				{"name" : "pejp","num":"27"},
+				{"name" : "ptec","num":"28"},
+				{"name" : "adps","num":"29"}
+			],
+			"name":"Téléinfo", 
+			"nombre": "1",
+			"logicalId":"teleinfo",
+			"isEnable":"1",
+			"configuration": [
+				{"name":"NULL","value":"NULL"}
 			]
 		}
 	],
@@ -67,7 +105,8 @@
 		{
 			"_comment": "Commande du plugin Racoon, Hors-gel",
 			"name":"Hors Gel",
-			"eqType":"racoon",
+			"eqType":"raco
+			on",
 			"logicalId":"horsgel",
 			"type":"action",
 			"configuration": [

@@ -72,8 +72,8 @@ class racoon extends eqLogic {
             if(json_decode($json_source,TRUE) == TRUE) {
               $data = json_decode($json_source,TRUE);
               switch ($element) {
-                case 'objet':
-                    $objet = $data['objet'];
+                case 'equipement':
+                    $objet = $data['equipement'];
                     return $objet;
                     break;
                 case 'commande':
@@ -99,45 +99,45 @@ class racoon extends eqLogic {
      */
     public static function creationObjet() {
       log::add('racoon','info','Création des objets');
-        $objet = self::recupererJSON('objet');
-        $nbObjet = count($objet);
+        $equipement = self::recupererJSON('objet');
+        $nbEquipement = count($equipement);
         //Premiere boucle pour les différents types d'objets
         //le maximum est donc $nbObjet
-        for ($iObjet=0; $iObjet <$nbObjet; $iObjet++) { 
+        for ($iEquipement=0; $iEquipement < $nbObjet; $iEquipement++) { 
           //Deuxieme boucle pour la quantité d'objet d'un type
-          //le maximum est donc $objet[$iObjet]['nombre']
+          //le maximum est donc $equipement[$iEquipement]['nombre']
 
-          $commande = $objet[$iObjet]['commande'];
+          $commande = $equipement[$iEquipement]['commande'];
           $nbCommande = count($commande);
 
-           for ($iNb=0; $iNb < $objet[$iObjet]['nombre']; $iNb++) { 
-              if($objet[$iObjet]['nombre'] == 1) {
-                $racoon = self::byLogicalId($objet[$iObjet]['logicalId'], 'racoon');
+           for ($iNb=0; $iNb < $equipement[$iEquipement]['nombre']; $iNb++) { 
+              if($equipement[$iEquipement]['nombre'] == 1) {
+                $racoon = self::byLogicalId($equipement[$iEquipement]['logicalId'], 'racoon');
               } else {
-                $racoon = self::byLogicalId($objet[$iObjet]['logicalId'] . ($iNb + 1), 'racoon');
+                $racoon = self::byLogicalId($equipement[$iEquipement]['logicalId'] . ($iNb + 1), 'racoon');
               }
               if(!is_object($racoon)) {
                 $racoon = new racoon();
-                $racoon->setEqType_name($objet[$iObjet]['eqType_name']);
-                if($objet[$iObjet]['nombre'] == 1) {
-                  $racoon->setName($objet[$iObjet]['name']);
-                  $racoon->setLogicalId($objet[$iObjet]['logicalId']);
+                $racoon->setEqType_name($equipement[$iEquipement]['eqType_name']);
+                if($equipement[$iEquipement]['nombre'] == 1) {
+                  $racoon->setName($equipement[$iEquipement]['name']);
+                  $racoon->setLogicalId($equipement[$iEquipement]['logicalId']);
                 } else {
-                  $racoon->setName($objet[$iObjet]['name'] .  ' ' . ($iNb + 1));
-                  $racoon->setLogicalId($objet[$iObjet]['logicalId'] . ($iNb + 1));
+                  $racoon->setName($equipement[$iEquipement]['name'] .  ' ' . ($iNb + 1));
+                  $racoon->setLogicalId($equipement[$iEquipement]['logicalId'] . ($iNb + 1));
                 }
-                $racoon->setIsEnable($objet[$iObjet]['isEnable']);
-                if($objet[$iObjet]['configuration'][0]['value'] == 'iNb'){
-                  $racoon->setConfiguration($objet[$iObjet]['configuration'][0]['name'],($iNb +1));
+                $racoon->setIsEnable($equipement[$iEquipement]['isEnable']);
+                if($equipement[$iEquipement]['configuration'][0]['value'] == 'iNb'){
+                  $racoon->setConfiguration($equipement[$iEquipement]['configuration'][0]['name'],($iNb +1));
                 } else {
-                  $racoon->setConfiguration($objet[$iObjet]['configuration'][0]['name'],$objet[$iObjet]['configuration'][0]['value']);
+                  $racoon->setConfiguration($equipement[$iEquipement]['configuration'][0]['name'],$equipement[$iEquipement]['configuration'][0]['value']);
                 }
                 $racoon->save();
                 log::add('racoon', 'info',print_r($racoon,true));
            } else {
                 log::add('racoon','debug','objet ' . $racoon->getName() .'déjà crée');
            }
-           self::creationCommande($racoon,$objet[$iObjet]['commande'],$nbCommande);
+           self::creationCommande($racoon,$equipement[$iEquipement]['commande'],$nbCommande);
 
         }
       }
