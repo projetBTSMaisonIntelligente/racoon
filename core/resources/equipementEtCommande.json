@@ -39,38 +39,27 @@
 			"_comment": "equipement du plugin Racoon, Teleinfo",
 			"eqType_name":"racoon",
 			"commande": [
-				{"name" : "timestamp","num":"5"},
-				{"name" : "date","num":"6"},
-				{"name" : "heure","num":"7"},
-				{"name" : "iinst","num":"8"},
-				{"name" : "motdetat","num":"9"},
-				{"name" : "optarif","num":"10"},
-				{"name" : "isousc","num":"11"},
-				{"name" : "adco","num":"12"},
-				{"name" : "hchc","num":"13"},
-				{"name" : "hchp","num":"14"},
-				{"name" : "papp","num":"15"},
-				{"name" : "imax","num":"16"},
-				{"name" : "hhphc","num":"17"},
-				{"name" : "base","num":"18"},
-				{"name" : "bbrhcjb","num":"19"},
-				{"name" : "bbrhpjb","num":"20"},
-				{"name" : "bbrhcjw","num":"21"},
-				{"name" : "bbrhpjw","num":"22"},
-				{"name" : "bbrhcjr","num":"23"},
-				{"name" : "bbrhpjr","num":"24"},
-				{"name" : "ejphn","num":"25"},
-				{"name" : "ejphpm","num":"26"},
-				{"name" : "pejp","num":"27"},
-				{"name" : "ptec","num":"28"},
-				{"name" : "adps","num":"29"}
 			],
 			"name":"Téléinfo", 
 			"nombre": "1",
 			"logicalId":"teleinfo",
 			"isEnable":"1",
 			"configuration": [
-				{"name":"NULL","value":"NULL"}
+				{"name":"teleinfo","value":"NULL"}
+			]
+		},
+		{
+			"_comment": "equipement du plugin Racoon, Teleinfo",
+			"eqType_name":"racoon",
+			"commande": [
+				{"name" : "'Valeur'","num":"5"}
+			],
+			"name":"Température", 
+			"nombre": "1",
+			"logicalId":"temperature",
+			"isEnable":"1",
+			"configuration": [
+				{"name":"temperature","value":"NULL"}
 			]
 		}
 	],
@@ -105,8 +94,7 @@
 		{
 			"_comment": "Commande du plugin Racoon, Hors-gel",
 			"name":"Hors Gel",
-			"eqType":"raco
-			on",
+			"eqType":"racoon",
 			"logicalId":"horsgel",
 			"type":"action",
 			"configuration": [
@@ -136,10 +124,23 @@
 			"logicalId":"statut",
 			"type":"info",
 			"configuration": [
-				{"name": "statut","value":"NULL"}
+				{"name": "valeur","value":"NULL"}
 			],
 			"subType":"string",
 			"display":"HEATING_STATE",
+			"eventOnly":"1"
+		},
+		{
+			"_comment": "Commande du plugin Racoon, Température",
+			"name":"Température",
+			"eqType":"racoon",
+			"logicalId":"temperature",
+			"type":"info",
+			"configuration": [
+				{"name": "valeur","value":"NULL"}
+			],
+			"subType":"numeric",
+			"display":"",
 			"eventOnly":"1"
 		}
 	]

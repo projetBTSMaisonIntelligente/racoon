@@ -40,7 +40,7 @@ class racoon extends eqLogic {
     const ARRET = 'A';
     const NOMBRE_MINI_FILPILOTE = 1;
     const NOMBRE_FILPILOTE = 7;
-    const CHEMIN_FICHIERJSON = '/usr/share/nginx/www/jeedom/plugins/racoon/core/resources/objetEtCommande.json';
+    const CHEMIN_FICHIERJSON = '/usr/share/nginx/www/jeedom/plugins/racoon/core/resources/equipementEtCommande.json';
 
     /*     * ***********************Methode static*************************** */
 
@@ -52,6 +52,8 @@ class racoon extends eqLogic {
      */
       public static function cron() {
           self::getStatut();
+          self::getTemperature();
+          self::getTeleinfo();
       }
 
   /**
@@ -73,8 +75,8 @@ class racoon extends eqLogic {
               $data = json_decode($json_source,TRUE);
               switch ($element) {
                 case 'equipement':
-                    $objet = $data['equipement'];
-                    return $objet;
+                    $equipement = $data['equipement'];
+                    return $equipement;
                     break;
                 case 'commande':
                     $commande = $data['commande'];
@@ -99,12 +101,12 @@ class racoon extends eqLogic {
      */
     public static function creationObjet() {
       log::add('racoon','info','Création des objets');
-        $equipement = self::recupererJSON('objet');
+        $equipement = self::recupererJSON('equipement');
         $nbEquipement = count($equipement);
-        //Premiere boucle pour les différents types d'objets
+        //Premiere boucle pour les différents types d'equipements
         //le maximum est donc $nbObjet
-        for ($iEquipement=0; $iEquipement < $nbObjet; $iEquipement++) { 
-          //Deuxieme boucle pour la quantité d'objet d'un type
+        for ($iEquipement=0; $iEquipement < $nbEquipement; $iEquipement++) { 
+          //Deuxieme boucle pour la quantité d'equipement d'un type
           //le maximum est donc $equipement[$iEquipement]['nombre']
 
           $commande = $equipement[$iEquipement]['commande'];
@@ -230,7 +232,7 @@ class racoon extends eqLogic {
      *
      */
    public function getStatut() {
-      log::add('racoon','debug','appel de getstatut()');
+      log::add('racoon','debug','appel de getStatut()');
       //Récupération des données enregistrées dans la page de configuration
       $deviceId = config::byKey('deviceid','racoon',0);
       $accessToken = config::byKey('accessToken','racoon',0);
@@ -246,18 +248,92 @@ class racoon extends eqLogic {
       $izone = self::NOMBRE_MINI_FILPILOTE;
       while ($izone <=self::NOMBRE_FILPILOTE) {
         $sparkZone = $izone-1;
-        $statut = $result[$sparkZone];
+        $valeur = $result[$sparkZone];
         $logical = 'zone' . $izone;
-        log::add('racoon','debug','Retour statut zone ' . $izone . ' valeur ' . $statut);
+        log::add('racoon','debug','Retour statut zone ' . $izone . ' valeur ' . $valeur);
         $racoon = self::byLogicalId($logical,'racoon');
-        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
-        $racoonCmd->setConfiguration('statut',$statut);
+        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'valeur');
+        $racoonCmd->setConfiguration('valeur',$valeur);
         $racoonCmd->save();
-        $racoonCmd->event($statut);
+        $racoonCmd->event($valeur);
         $izone++;
       }
       return true;
    }
+   /**
+     * Récupération de la température enregistrée sur le Spark Core grâve au module 433MHz
+     *
+     * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
+     *
+     * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
+     *
+     */
+   public function getTemperature() {
+      log::add('racoon','debug','appel de getTemperature()');
+      //Récupération des données enregistrées dans la page de configuration
+      $deviceId = config::byKey('deviceid','racoon',0);
+      $accessToken = config::byKey('accessToken','racoon',0);
+      $spark = self::configurationSparkCore($accessToken);
+      if ($spark->getVariable($deviceId,"temperature") == true) {
+        $obj = $spark->getResult();
+        $result = $obj['result'];
+      } else {
+          log::add('racoon','error','erreur d\'appel de la variable temperature,' . $spark->getError() . ' source ' . $spark->getErrorSource());
+          return false;
+      }
+      $valeur = $result;
+      $logical = 'temperature';
+      log::add('racoon','debug','Retour ' . print_r($result,true));
+      $racoon = self::byLogicalId($logical,'racoon');
+      $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'valeur');
+      $racoonCmd->setConfiguration('valeur',$valeur);
+      $racoonCmd->save();
+      $racoon->event($valeur);
+      return true;
+    }
+     /**
+     * Récupération des téléinfos enregistrées sur le Spark Core
+     *
+     * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
+     *
+     * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
+     *
+     */
+   public function getTeleinfo() {
+      log::add('racoon','debug','appel de getTeleinfo()');
+      //Récupération des données enregistrées dans la page de configuration
+      $deviceId = config::byKey('deviceid','racoon',0);
+      $accessToken = config::byKey('accessToken','racoon',0);
+      $spark = self::configurationSparkCore($accessToken);
+      if ($spark->getVariable($deviceId,"temperature") == true) {
+        $obj = $spark->getResult();
+        $result = $obj['result'];
+      } else {
+          log::add('racoon','error','erreur d\'appel de la variable teleinfo,' . $spark->getError() . ' source ' . $spark->getErrorSource());
+          return false;
+      }
+      $teleinfo = json_decode($result,true); 
+      log::add('racoon','debug','Retour ' . print_r($result,true));
+      foreach($teleinfo[$key] as $valeur)
+        log::add('racoon','debug','Retour teleinfo ' . $key . 'valeur' . $valeur);
+        $racoon = self::byLogicalId($logical,'racoon');
+        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),$key);
+        if(!is_object($racoonCmd))
+        {
+          $racoonCmd = new racoonCmd();
+          $racoonCmd->setName($key);
+          $racoonCmd->setEqLogic_id($racoon->getId());
+          $racoonCmd->setEqType('racoon');
+          $racoonCmd->setLogicalId($key);
+          $racoonCmd->setType('info');
+          $racoonCmd->setSubType('numeric');
+          $racoonCmd->setEventOnly(1);
+        }
+        $racoonCmd->setConfiguration('valeur',$valeur);
+        $racoonCmd->save();
+        $racoon->event($valeur);
+      return true;
+    }
 
    /**
      * Envoi d'ordre $request à la zone $zone via requête HTTP par méthode POST pour les radiateurs.  
@@ -367,7 +443,7 @@ class racoonCmd extends cmd {
     public function execute($_options = array()) {
       switch($this->getType()) {
         case 'info' :
-          return $this->getConfiguration('statut');
+          return $this->getConfiguration('valeur');
           break;
         case 'action' :
           $request = $this->getConfiguration('request');
