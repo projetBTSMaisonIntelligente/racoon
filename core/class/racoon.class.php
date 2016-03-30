@@ -252,7 +252,7 @@ class racoon extends eqLogic {
         $logical = 'zone' . $izone;
         log::add('racoon','debug','Retour statut zone ' . $izone . ' valeur ' . $valeur);
         $racoon = self::byLogicalId($logical,'racoon');
-        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'valeur');
+        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
         $racoonCmd->setConfiguration('valeur',$valeur);
         $racoonCmd->save();
         $racoonCmd->event($valeur);
@@ -285,10 +285,10 @@ class racoon extends eqLogic {
       $logical = 'temperature';
       log::add('racoon','debug','Retour ' . print_r($result,true));
       $racoon = self::byLogicalId($logical,'racoon');
-      $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'valeur');
+      $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'temperature');
       $racoonCmd->setConfiguration('valeur',$valeur);
       $racoonCmd->save();
-      $racoon->event($valeur);
+      $racoonCmd->event($valeur);
       return true;
     }
      /**
@@ -305,7 +305,7 @@ class racoon extends eqLogic {
       $deviceId = config::byKey('deviceid','racoon',0);
       $accessToken = config::byKey('accessToken','racoon',0);
       $spark = self::configurationSparkCore($accessToken);
-      if ($spark->getVariable($deviceId,"temperature") == true) {
+      if ($spark->getVariable($deviceId,"teleinfo") == true) {
         $obj = $spark->getResult();
         $result = $obj['result'];
       } else {
@@ -313,10 +313,10 @@ class racoon extends eqLogic {
           return false;
       }
       $teleinfo = json_decode($result,true); 
-      log::add('racoon','debug','Retour ' . print_r($result,true));
-      foreach($teleinfo[$key] as $valeur)
-        log::add('racoon','debug','Retour teleinfo ' . $key . 'valeur' . $valeur);
-        $racoon = self::byLogicalId($logical,'racoon');
+      log::add('racoon','debug','Retour ' . print_r($teleinfo,true));
+      foreach($teleinfo as $key => $valeur)
+        log::add('racoon','debug','Retour teleinfo ' . $key . ' valeur ' . $valeur);
+        $racoon = self::byLogicalId('teleinfo','racoon');
         $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),$key);
         if(!is_object($racoonCmd))
         {
@@ -331,7 +331,7 @@ class racoon extends eqLogic {
         }
         $racoonCmd->setConfiguration('valeur',$valeur);
         $racoonCmd->save();
-        $racoon->event($valeur);
+        $racoonCmd->event($valeur);
       return true;
     }
 
