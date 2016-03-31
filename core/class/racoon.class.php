@@ -314,9 +314,9 @@ class racoon extends eqLogic {
       }
       $teleinfo = json_decode($result,true); 
       log::add('racoon','debug','Retour ' . print_r($teleinfo,true));
-      foreach($teleinfo as $key => $valeur)
+      $racoon = self::byLogicalId('teleinfo','racoon');
+      foreach($teleinfo as $key => $valeur) {
         log::add('racoon','debug','Retour teleinfo ' . $key . ' valeur ' . $valeur);
-        $racoon = self::byLogicalId('teleinfo','racoon');
         $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),$key);
         if(!is_object($racoonCmd))
         {
@@ -332,6 +332,7 @@ class racoon extends eqLogic {
         $racoonCmd->setConfiguration('valeur',$valeur);
         $racoonCmd->save();
         $racoonCmd->event($valeur);
+      }
       return true;
     }
 
