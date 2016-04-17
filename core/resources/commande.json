@@ -1,0 +1,103 @@
+{
+	"commande": [
+		{
+			"_comment": "Commande du plugin Racoon, Confort",
+			"name":"Confort",
+			"eqType":"racoon",
+			"logicalId":"confort",
+			"type":"action",
+			"configuration": [
+				{"name": "mode","value":"filPilote"},
+				{"name": "request","value":"C"}
+			],
+			"subType":"other",
+			"display":"HEATING_ON",
+			"unite":""
+		},
+		{
+			"_comment": "Commande du plugin Racoon, Eco",
+			"name":"Eco",
+			"eqType":"racoon",
+			"logicalId":"eco",
+			"type":"action",
+			"configuration": [
+				{"name": "mode","value":"filPilote"},
+				{"name": "request","value":"E"}
+			],
+			"subType":"other",
+			"display":"HEATING_OTHER",
+			"unite":""
+		},
+		{
+			"_comment": "Commande du plugin Racoon, Hors-gel",
+			"name":"Hors Gel",
+			"eqType":"racoon",
+			"logicalId":"horsgel",
+			"type":"action",
+			"configuration": [
+				{"name": "mode","value":"filPilote"},
+				{"name": "request","value":"H"}
+			],
+			"subType":"other",
+			"display":"HEATING_OTHER",
+			"unite":""
+		},
+		{
+			"_comment": "Commande du plugin Racoon, Arrêt",
+			"name":"Arrêt",
+			"eqType":"racoon",
+			"logicalId":"arret",
+			"type":"action",
+			"configuration": [
+				{"name": "mode","value":"filPilote"},
+				{"name": "request","value":"A"}
+			],
+			"subType":"other",
+			"display":"HEATING_OFF",
+			"unite":""
+		},
+		{
+			"_comment": "Commande du plugin Racoon, Statut",
+			"name":"Statut",
+			"eqType":"racoon",
+			"logicalId":"statut",
+			"type":"info",
+			"configuration": [
+				{"name": "mode","value":"filPilote"},
+				{"name": "value","value":"A"}
+			],
+			"subType":"string",
+			"display":"HEATING_STATE",
+			"unite":""
+		},
+		{
+			"_comment": "Commande du plugin Racoon, Température",
+			"name":"Température",
+			"eqType":"racoon",
+			"logicalId":"temperature",
+			"type":"info",
+			"configuration": [
+				{"name": "mode","value":"regulation"},
+				{"name": "value","value":"NULL"}
+			],
+			"subType":"numeric",
+			"display":"TEMPERATURE",
+			"unite":"°C"
+		},
+		{
+			"_comment": "Commande du plugin Racoon, Consigne",
+			"name":"Consigne",
+			"eqType":"racoon",
+			"logicalId":"consigne",
+			"type":"action",
+			"configuration": [
+				{"name": "mode","value":"regulation"},
+				{"name": "request","value":"NULL"},
+				{"name":"activer","value":"0"}
+			],
+			"subType":"slider",
+			"display":"TEMPERATURE",
+			"unite":"°C"
+		}
+	]
+}

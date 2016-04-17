@@ -48,7 +48,8 @@ try {
             ajax::error(displayExeption($e), $e->getCode());
         }
         **/
-        $return = racoon::creationObjet();
+        $return = racoon::creationEquipement();
+        racoonCmd::setIsVisibleCmd();
         ajax::success($return);
      }
 

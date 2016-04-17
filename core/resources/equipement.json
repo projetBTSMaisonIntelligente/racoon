@@ -1,0 +1,86 @@
+{
+	"equipement": [
+		{
+			"_comment": "equipement du plugin Racoon, Zone",
+			"eqType_name":"racoon",
+			"commande": [
+				{"name" : "confort","num":"0"},
+				{"name" : "eco","num":"1"},
+				{"name" : "horsGel","num":"2"},
+				{"name" : "arret","num":"3"},
+				{"name" : "statut","num":"4"},
+				{"name" : "consigne","num":"6"}
+			],
+			"name":"Zone 1", 
+			"logicalId":"zone1",
+			"isEnable":"1",
+			"configuration": [
+				{"name":"zone","value":"1"},
+				{"name":"icone","value":"radiateur"}
+			]
+		},
+		{
+			"_comment": "equipement du plugin Racoon, Zone",
+			"eqType_name":"racoon",
+			"commande": [
+				{"name" : "confort","num":"0"},
+				{"name" : "eco","num":"1"},
+				{"name" : "horsGel","num":"2"},
+				{"name" : "arret","num":"3"},
+				{"name" : "statut","num":"4"},
+				{"name" : "consigne","num":"6"}
+			],
+			"name":"Zone 2", 
+			"logicalId":"zone2",
+			"isEnable":"1",
+			"configuration": [
+				{"name":"zone","value":"2"},
+				{"name":"icone","value":"radiateur"}
+			]
+		},
+		{
+			"_comment": "equipement du plugin Raccon, Global",
+			"eqType_name":"racoon",
+			"commande": [
+				{"name" : "'confort'","num":"0"},
+				{"name" : "'eco'","num":"1"},
+				{"name" : "'horsGel'","num":"2"},
+				{"name" : "'arret'","num":"3"}
+			],
+			"name":"Global", 
+			"logicalId":"global",
+			"isEnable":"1",
+			"configuration": [
+				{"name":"zone","value":"0"},
+				{"name":"icone","value":"radiateur"}
+			]
+		},
+		{
+			"_comment": "equipement du plugin Racoon, Teleinfo",
+			"eqType_name":"racoon",
+			"commande": [
+			],
+			"name":"Téléinfo", 
+			"logicalId":"teleinfo",
+			"isEnable":"1",
+			"configuration": [
+				{"name":"teleinfo","value":"NULL"},
+				{"name":"icone","value":"compteur"}
+			]
+		},
+		{
+			"_comment": "equipement du plugin Racoon, Température",
+			"eqType_name":"racoon",
+			"commande": [
+				{"name" : "'Valeur'","num":"5"}
+			],
+			"name":"Température", 
+			"logicalId":"temperature",
+			"isEnable":"1",
+			"configuration": [
+				{"name":"temperature","value":"NULL"},
+				{"name":"icone","value":"temperature"}
+			]
+		}
+	]
+}
