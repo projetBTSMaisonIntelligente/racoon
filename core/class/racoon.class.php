@@ -42,6 +42,7 @@ class racoon extends eqLogic {
     public static $_fonctionnalite = array("fonction_teleinfo"=>0,"fonction_regulation"=>1,"fonction_filPilote"=>2);
     public static $_idSpark = array("device_id"=>0,"access_token"=>1);
     public static $_activerFonctionnalite = array("desactiver"=>0,"activer"=>1);
+    public static $_configRegulation = array("kp"=>0,"ki"=>1,"kd"=>2,"tempMin"=>3,"tempMax"=>4);
     const CHEMIN_FICHIERJSON = '/usr/share/nginx/www/jeedom/plugins/racoon/core/resources/';
 
 
@@ -501,15 +502,11 @@ public static function getNombreFilPilote() {
         return false;
     }
     
-    public static function setConfigRegulation() {
-      log::add('racoon','debug','Appel de setConfigRegulation()');
-      $config = self::getConfigRegulation();
-      //$parametre = ;
-
-    }
     public static function setRegulation() {
-      log::add('racoon','debug','Appel de setConsigne()');
-      $parametre = $zone . ',' . $request;
+      log::add('racoon','debug','Appel de setRegulation()');
+      $config = self::getConfigRegulation();
+
+      $parametre = $zone . ',' . $request . ',' . $config[self::$_configRegulation["kp"]] . ',' . $config[self::$_configRegulation["ki"]] . ',' . $config[self::$_configRegulation["kd"]] . ',' . $config[self::$_configRegulation["tempMin"]] . ',' . $config[self::$_configRegulation["tempMax"]];
       $fonctionSparkCore = 'setRegulation';
        if(self::requeteFonctionSparkCore($fonctionSparkCore,$parametre))
        {

@@ -56,43 +56,61 @@ if (!isConnect()) {
 	       <div class="form-group">
 	             <label class="col-lg-4 control-label">{{Régulation}}</label>
 	             <div class="col-lg-4">
-	                 <input type="checkbox" class="configKey  bootstrapSwitch" data-l1key="regulation" />
+	                 <input id="regulation_activer" type="checkbox" class="configKey  bootstrapSwitch" data-l1key="regulation" />
 	             </div>
 
-	             <div class="form-group">
+	        	<div id="regulation_kp" class="form-group">
 	        		<label class="col-lg-4 control-label">{{Kp : action proportionnelle}}</label>
 	        		<div class="col-lg-4">
 	          			<input class="configKey form-control" data-l1key="Kp" style="margin-top:5px" placeholder="ex : 4025"/>
 	        		</div>
-	      	</div>
-	      	<div class="form-group">
+	      		</div>
+	      		<div id="regulation_ki" class="form-group">
 	        		<label class="col-lg-4 control-label">{{Ki : action intégrale}}</label>
 	        		<div class="col-lg-4">
 	          			<input class="configKey form-control" data-l1key="Ki" style="margin-top:5px" placeholder="ex : 4025"/>
 	        		</div>
-	      	</div>
-	      	<div class="form-group">
+	      		</div>
+	      		<div id="regulation_kd" class="form-group">
 	        		<label class="col-lg-4 control-label">{{Kd : action dérivée}}</label>
 	        		<div class="col-lg-4">
 	          			<input class="configKey form-control" data-l1key="Kd" style="margin-top:5px" placeholder="ex : 4025"/>
 	        		</div>
-	      	</div>
-	      	<div class="form-group">
+	      		</div>
+	      		<div id="regulation_tempMin" class="form-group">
 	        		<label class="col-lg-4 control-label">{{Température minimum de la régulation}}</label>
 	        		<div class="col-lg-4">
 	          			<input class="configKey form-control" data-l1key="limiteTempMin" style="margin-top:5px" placeholder="ex : 16"/>
 	        		</div>
-	      	</div>
-	      	<div class="form-group">
+	      		</div>
+	      		<div id="regulation_tempMax" class="form-group">
 	        		<label class="col-lg-4 control-label">{{Température maximum de la régulation}}</label>
 	        		<div class="col-lg-4">
 	          			<input class="configKey form-control" data-l1key="limiteTempMax" style="margin-top:5px" placeholder="ex : 22"/>
 	        		</div>
-	      	</div>
+	      		</div>
 	      </div>
    </div>
 
       <script>
+      	$(document).ready(function(){
+      		if($('#regulation_activer').prop('checked',true)){
+      			$('#regulation_kp').show();
+      			$('#regulation_ki').show();
+      			$('#regulation_kd').show();
+      			$('#regulation_tempMin').show();
+      			$('#regulation_tempMax').show();
+      		}
+      		else {
+      			$('#regulation_kp').hide();
+      			$('#regulation_ki').hide();
+      			$('#regulation_kd').hide();
+      			$('#regulation_tempMin').hide();
+      			$('#regulation_tempMax').hide();
+      		}
+
+		});
+
         function racoon_postSaveConfiguration(){
             $.ajax({// fonction permettant de faire de l'ajax
             type: "POST", // methode de transmission des données au fichier php
@@ -113,6 +131,7 @@ if (!isConnect()) {
         });
      }
       </script>
+      		}
     </div>
 </fieldset>
 </form>
