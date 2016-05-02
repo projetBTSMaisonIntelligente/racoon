@@ -1,0 +1,163 @@
+{
+	"commande": {
+		"sparkCoreVariable":[
+			{
+				"_comment": "Commande du plugin Racoon, selon les valeurs récupérés depuis le spark core",
+				"name":"nomCommande",
+				"eqType":"racoon",
+				"logicalId":"nomCommande",
+				"type":"info",
+				"configuration": [
+					{"name":"mode"			,"value":"sparkCore"},
+					{"name":"utiliserPar"	,"value":""},
+					{"name":"aRecuperer"	,"value":false},
+					{"name":"value" 		,"value":""}
+				],
+				"subType":"string",
+				"display":"GENERIC",
+				"unite":""
+			}
+		],
+		"sparkCoreFonction":[
+			{
+				"_comment": "Commande du plugin Racoon, selon les valeurs récupérés depuis le spark core",
+				"name":"nomCommande",
+				"eqType":"racoon",
+				"logicalId":"nomCommande",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"	,"value":"sparkCore"},
+					{"name":"aUtiliser"	,"value":false},
+					{"name":"utiliserPar"	,"value":""},
+					{"name":"parametre" ,"value":""}
+				],
+				"subType":"other",
+				"display":"MODE_SET_STATE",
+				"unite":""
+			}
+		],
+		"filPilote":[
+			{
+				"_comment": "Commande du plugin Racoon, Confort",
+				"name":"Confort",
+				"eqType":"racoon",
+				"logicalId":"confort",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"		,"value":"filPilote"},
+					{"name":"request"	,"value":"C"}
+				],
+				"subType":"other",
+				"display":"HEATING_ON",
+				"unite":""
+			},
+			{
+				"_comment": "Commande du plugin Racoon, Eco",
+				"name":"Eco",
+				"eqType":"racoon",
+				"logicalId":"eco",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"	,"value":"filPilote"},
+					{"name":"request"	,"value":"E"}
+				],
+				"subType":"other",
+				"display":"HEATING_OTHER",
+				"unite":""
+			},
+			{
+				"_comment": "Commande du plugin Racoon, Hors-gel",
+				"name":"Hors Gel",
+				"eqType":"racoon",
+				"logicalId":"horsgel",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"	,"value":"filPilote"},
+					{"name":"request"	,"value":"H"}
+				],
+				"subType":"other",
+				"display":"HEATING_OTHER",
+				"unite":""
+			},
+			{
+				"_comment": "Commande du plugin Racoon, Arrêt",
+				"name":"Arrêt",
+				"eqType":"racoon",
+				"logicalId":"arret",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"	,"value":"filPilote"},
+					{"name":"request"	,"value":"A"}
+				],
+				"subType":"other",
+				"display":"HEATING_OFF",
+				"unite":""
+			},
+			{
+				"_comment": "Commande du plugin Racoon, Statut",
+				"name":"Statut",
+				"eqType":"racoon",
+				"logicalId":"statut",
+				"type":"info",
+				"configuration": [
+					{"name":"mode"	,"value":"filPilote"},
+					{"name":"value"	,"value":"A"}
+				],
+				"subType":"string",
+				"display":"HEATING_STATE",
+				"unite":""
+			},
+			{
+				"_comment": "Commande du plugin Racoon, Consigne",
+				"name":"Consigne",
+				"eqType":"racoon",
+				"logicalId":"consigne",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"	,"value":"regulation"},
+					{"name":"request"	,"value":""},
+					{"name":"ki"	,"value":""},
+					{"name":"kp"	,"value":""},
+					{"name":"kd"	,"value":""},
+					{"name":"minValue"	,"value":""},
+					{"name":"maxValue"	,"value":""}
+				],
+				"subType":"slider",
+				"display":"TEMPERATURE",
+				"unite":"°C"
+			}
+		],
+	 	"temperature":[
+			{
+				"_comment": "Commande du plugin Racoon, Température",
+				"name":"Température",
+				"eqType":"racoon",
+				"logicalId":"temperature",
+				"type":"info",
+				"configuration": [
+					{"name":"mode"	,"value":"temperature"},
+					{"name":"value"	,"value":""}
+				],
+				"subType":"numeric",
+				"display":"TEMPERATURE",
+				"unite":"°C"
+			}
+		],
+		"teleinfo":[
+			{
+				"_comment" :"exemple Commande teleinfo",
+				"name":"nomCommande",
+				"eqType":"racoon",
+				"logicalId":"nomCommande",
+				"type":"info",
+				"configuration": [
+					{"name":"mode"	,"value":"teleinfo"},
+					{"name":"value"	,"value":""}
+				],
+				"subType":"numeric",
+				"display":"GENERIC",
+				"unite":""
+			}
+		]
+	}
+}

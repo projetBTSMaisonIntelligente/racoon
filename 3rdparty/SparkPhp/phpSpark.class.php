@@ -37,7 +37,7 @@ class phpSpark
     }
 
     /**
-     * Sets the timeout used for calls against the api. 
+     * Sets the timeout used for calls against the api.
      *
      * @param int $timeout The amount of time, in seconds, for a call to wait for data before returning with a TIMEOUT error
      *
@@ -58,7 +58,7 @@ class phpSpark
             return false;
         }
     }
-    
+
     /**
      * Sets the authentication details for authenticating with the API
      *
@@ -174,7 +174,7 @@ class phpSpark
             return true;
         }
     }
-    
+
     /**
      * Private Function. Sets the internal _error & _errorSource variables. Allow for tracking which function resulted in an error and what that error was
      *
@@ -189,7 +189,7 @@ class phpSpark
         $this->_error = $errorText;
         $this->_errorSource = $errorSource;
     }
-    
+
     /**
      * Private Function. Sets the internal _errorSource. Allow for tracking which function resulted in an error
      *
@@ -293,7 +293,7 @@ class phpSpark
     {
         return $this->_debug_r($debugArray, $override = true);
     }
-    
+
     /**
      * Runs a spark function on the device. Requires the accessToken to be set
      *
@@ -306,14 +306,14 @@ class phpSpark
     public function callFunction($deviceID, $deviceFunction, $params)
     {
             $url = $this->_endpoint .'v1/devices/' . $deviceID . '/' . $deviceFunction;
-            $result =  $this->_curlRequest($url, array('args'=>$params), 'post');
-            
+            $result =  $this->_curlRequest($url, array('params'=>$params), 'post');
+
             return $result;
     }
-    
+
     /**
      * Gets the value of a spark variable. Requires the accessToken to be set
-     * 
+     *
      * @param string $deviceID The device ID of the device to call the function on
      * @param string $variableName The name of the variable to retrieve
      *
@@ -323,10 +323,10 @@ class phpSpark
     {
             $url = $this->_endpoint .'v1/devices/' . $deviceID . '/' . $variableName;
             $result = $this->_curlRequest($url, array(), 'get');
-            
+
             return $result;
     }
-    
+
     /**
      * Lists all your cores assigned to your cloud account. Requires the accessToken to be set
      *
@@ -347,14 +347,14 @@ class phpSpark
      *
      * @return boolean true if the call was successful, false otherwise. Use getResult to get the api result and use getError & getErrorSource to determine what happened in the event of an error
      */
-    public function getAttributes($deviceID)
+    public function getDeviceInfo($deviceID)
     {
             $url = $this->_endpoint .'v1/devices/' . $deviceID;
             $result = $this->_curlRequest($url, array(), 'get');
-            
+
             return $result;
     }
-    
+
     /**
      * Set the name/renames your core. Requires the accessToken to be set
      *
@@ -363,23 +363,22 @@ class phpSpark
      *
      * @return boolean true if the call was successful, false otherwise. Use getResult to get the api result and use getError & getErrorSource to determine what happened in the event of an error
      */
-    public function renameCore($deviceID,$name)
+    public function setDeviceName($deviceID,$name)
     {
             $url = $this->_endpoint .'v1/devices/' . $deviceID;
             $result = $this->_curlRequest($url, array("name" => $name), 'put');
-            
+
             return $result;
     }
-    
+
     /**
      * Attempts to add a device to your cloud account. Requires the accessToken to be set. Note, you may want to follow this up with a call to "setName" as new Core's names are blank. Interestingly, if claiming an order core their name is retained across the unclaim/claim process
      *
-     * @param string $deviceID The device ID of the device to claim. 
+     * @param string $deviceID The device ID of the device to claim.
      * @param boolean $requestTransfer If true requests that the device be transfered to your account (use if the device is already claimed). If false will try to claim but not automatically send a transfer request
      *
      * @return boolean true if the call was successful, false otherwise. Use getResult to get the api result and use getError & getErrorSource to determine what happened in the event of an error
      */
-
     public function claimDevice($deviceID, $requestTransfer = false)
     {
             $url = $this->_endpoint .'v1/devices';
@@ -388,22 +387,22 @@ class phpSpark
                 $result = $this->_curlRequest($url, array('id' => $deviceID, 'request_transfer' => 'true'), 'post');
             else
                 $result = $this->_curlRequest($url, array('id' => $deviceID, 'request_transfer' => 'false'), 'post');
-            
+
             return $result;
     }
-    
+
     /**
      * Removes the core from your cloud account. Requires the accessToken to be set
      *
-     * @param string $deviceID The device ID of the device to remove from your account. 
+     * @param string $deviceID The device ID of the device to remove from your account.
      *
      * @return boolean true if the call was successful, false otherwise. Use getResult to get the api result and use getError & getErrorSource to determine what happened in the event of an error
      */
-    public function removeDevice($deviceID)
+    public function deleteDevice($deviceID)
     {
             $url = $this->_endpoint ."v1/devices/{$deviceID}/";
             $result = $this->_curlRequest($url, array(), 'delete');
-            
+
             return $result;
     }
 
@@ -424,25 +423,25 @@ class phpSpark
 
             $url = $this->_endpoint .'v1/devices/' . $deviceID;
             $params = array('file' => $cfile);
-            if($isBinary == true) 
+            if($isBinary == true)
                 $params['file_type'] = "binary";
-            $result = $this->_curlRequest($url, $params, 'put-file');  
-            return $result; 
+            $result = $this->_curlRequest($url, $params, 'put-file');
+            return $result;
     }
-    
+
     /**
      * Gets a list of your tokens from the spark cloud. Requires the email/password auth to be set
      *
      * @return boolean true if the call was successful, false otherwise. Use getResult to get the api result and use getError & getErrorSource to determine what happened in the event of an error
      */
-    public function listAccessTokens()
+    public function listTokens()
     {
             $url = $this->_endpoint .'v1/access_tokens';
             $result = $this->_curlRequest($url, array(), 'get', 'basic');
-            
+
             return $result;
     }
-    
+
     /**
      * Creates a new token on the spark cloud. Requires the email/password auth to be set
      *
@@ -453,7 +452,6 @@ class phpSpark
      *
      * @return boolean true if the call was successful, false otherwise. Use getResult to get the api result and use getError & getErrorSource to determine what happened in the event of an error
      */
-
     public function newAccessToken($expires_in = false, $expires_at = false, $clientID = false, $clientSecret = false)
     {
         $fields = array('grant_type' => 'password', 'username' => $this->_email, 'password' => $this->_password);
@@ -475,7 +473,7 @@ class phpSpark
 
         return $result;
     }
-    
+
     /**
      * Removes the token from the spark cloud. Requires the email/password auth to be set
      *
@@ -483,11 +481,11 @@ class phpSpark
      *
      * @return boolean true if the call was successful, false otherwise. Use getResult to get the api result and use getError & getErrorSource to determine what happened in the event of an error
      */
-    public function deleteAccessToken($token)
+    public function deleteToken($token)
     {
             $url = $this->_endpoint .'v1/access_tokens/'.$token;
             $result = $this->_curlRequest($url, array(), 'delete', 'basic');
-            
+
             return $result;
     }
 
@@ -501,10 +499,10 @@ class phpSpark
             $fields = array();
             $url = $this->_endpoint .'v1/webhooks';
             $result = $this->_curlRequest($url, $fields, 'get');
-            
+
             return $result;
     }
-    
+
     /**
      * Creates a new webhook on the spark cloud. Requires the accessToken to be set
      * @param string $event The event name used to trigger the webhook
@@ -520,7 +518,7 @@ class phpSpark
             $fields = array_merge(array('event' => $event, 'url' => $webhookUrl),$extras);
 
             $result = $this->_curlRequest($url, $fields , 'post');
-            
+
             return $result;
     }
 
@@ -534,10 +532,10 @@ class phpSpark
             $fields = array();
             $url = $this->_endpoint ."v1/webhooks/{$webhookID}/";
             $result = $this->_curlRequest($url, $fields, 'delete');
-            
+
             return $result;
     }
-    
+
     /**
      * Sets the spark core signal mode state. Requires the accessToken to be set
      *
@@ -551,10 +549,10 @@ class phpSpark
             $fields = array('signal' => $signalState);
             $url = $this->_endpoint ."v1/devices/{$deviceID}/";
             $result = $this->_curlRequest($url, $fields, 'put');
-            
+
             return $result;
     }
-    
+
     /**
      * Returns the latest error
      *
@@ -584,7 +582,7 @@ class phpSpark
     {
         return $this->_result;
     }
-    
+
     /**
      * Private Function. Performs a CURL Request with the given parameters
      *
@@ -597,14 +595,14 @@ class phpSpark
      */
     private function _curlRequest($url, $params = null, $type = 'post', $authType = 'none')
     {
-        
+
         $fields_string = null;
 
         if($authType == 'none')
             if ($this->_accessToken)
             {
                $params['access_token'] = $this->_accessToken;
-            } 
+            }
             else
             {
                 $errorText = "No access token set";
@@ -612,7 +610,7 @@ class phpSpark
                 $this->_setError($errorText, $caller['function']);
                 return false;
             }
-            
+
 
         // is cURL installed yet?
         if (!function_exists('curl_init'))
@@ -627,7 +625,7 @@ class phpSpark
         {
             $url .= ("?" . http_build_query($params));
         }
-        else if ($type == 'post') 
+        else if ($type == 'post')
         {
             curl_setopt($ch,CURLOPT_POST,count($params));
             curl_setopt($ch,CURLOPT_POSTFIELDS,http_build_query($params));
@@ -645,12 +643,12 @@ class phpSpark
             curl_setopt($ch,CURLOPT_POSTFIELDS,$params);
             $url .= "?access_token=" . $this->_accessToken;
         }
-        else if ($type == 'delete') 
+        else if ($type == 'delete')
         {
             $url .= ("?" . http_build_query($params));
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-        } 
-        else 
+        }
+        else
         {
             $errorText = "Unsupported method type (" . $type . ")";
             $this->_setError($errorText, __FUNCTION__);
@@ -659,14 +657,14 @@ class phpSpark
 
         $this->_debug("Opening a {$type} connection to {$url}");
         curl_setopt($ch, CURLOPT_URL, $url);
-        
+
         if($this->_disableSSL)
         {
             // stop the verification of certificate
             $this->_debug("[WARN] Disabling SSL Verification for CURL");
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         }
-        
+
         // Set a referer
         // curl_setopt($ch, CURLOPT_REFERER, "http://www.example.com/curl.htm");
 
@@ -681,7 +679,7 @@ class phpSpark
 
         // Timeout in seconds
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->_curlTimeout);
-        
+
         $this->_debug("Auth Type: " . $authType);
         // basic auth
         if ($authType == 'basic') {
@@ -702,7 +700,7 @@ class phpSpark
             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
             curl_setopt($ch, CURLOPT_USERPWD, "spark:spark");
         }
-        
+
         // Download the given URL, and return output
         $this->_debug("Executing Curl Operation");
         $this->_debug("Url:");
@@ -710,9 +708,9 @@ class phpSpark
         $this->_debug("Params:");
         $this->_debug_r($params);
         $output = curl_exec($ch);
-        
+
         $this->_debug("Curl Result: '" .  $output . "'");
-        
+
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $this->_debug("Curl Response Code: '" .  $httpCode."'");
         // Close the cURL resource, and free system resources
@@ -757,7 +755,7 @@ class phpSpark
             }
         }
     }
-    
+
     /**
      * Private Function. Returns a human readable string for a given CURL Error Code
      *

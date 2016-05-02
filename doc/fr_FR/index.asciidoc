@@ -5,12 +5,25 @@
 
 == Description ==
 
-Plugin Jeedom pour la gestion des radiateurs dans sa maison grâce à des fils pilote contrôlés par un Spark Core.
+Plugin Jeedom pour gérer un Spark Core https://www.particle.io/
 
+De plus, le plugin permet la gestion de zones de radiateur grâce aux fil pilotes, la récupération de téléinformations, la récupération de la température grâce à un programme http://github.com/projetBTSMaisonIntelligente/
 
 === Configuration ===
 
 include::configuration.asciidoc[]
+
+=== Description des erreurs ===
+
+include::erreur.asciidoc[]
+
+== Fonctionnalités ==
+
+=== Gestion d'un Spark Core ===
+
+- Variable :
+
+- Fonction :
 
 === Gestion d'une zone ===
 
@@ -28,10 +41,24 @@ image::../images/pageGestionZone.png[]
 
 - Statut : Permet de récupérer le statut de la zone sélectionnée.
 
+- Consigne : Permet la régulation PID sur la zone sélectionnée selon plusieurs paramètres
+
 *Widget*
 
 image::../images/widget.PNG[]
 
-*Scénario*
+=== Gestion des téléinfos === 
+
+- Etiquette : 
+
+*Widget*
+
+=== Gestion de la température ===
+
+- Température :
+
+*Widget*
+
+== Scénario == 
 
 Possibilité d'associer des capteurs de température avec les zones de radiateur.

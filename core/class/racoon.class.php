@@ -20,7 +20,7 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 if(!class_exists("phpSpark"))
 {
-    require_once dirname(__FILE__) . '/../../3rdparty/phpParticle/phpSpark.class.php';
+    require_once dirname(__FILE__) . '/../../3rdparty/SparkPhp/phpSpark.class.php';
 }
 
 /**
@@ -33,17 +33,15 @@ if(!class_exists("phpSpark"))
      * @version 1.1
      */
 class racoon extends eqLogic {
-    /*     * *************************Attributs****************************** */
+/*     * *************************Attributs****************************** */
     const CONFORT = 'C';
     const ECONOMIQUE = 'E';
     const HORSGEL = 'H';
     const ARRET = 'A';
+    const DELESTAGE = 'D';
     const NOMBRE_MINI_FILPILOTE = 1;
-    public static $_fonctionnalite = array("fonction_teleinfo"=>0,"fonction_regulation"=>1,"fonction_filPilote"=>2);
-    public static $_idSpark = array("device_id"=>0,"access_token"=>1);
-    public static $_activerFonctionnalite = array("desactiver"=>0,"activer"=>1);
-    public static $_configRegulation = array("kp"=>0,"ki"=>1,"kd"=>2,"tempMin"=>3,"tempMax"=>4);
-    const CHEMIN_FICHIERJSON = '/usr/share/nginx/www/jeedom/plugins/racoon/core/resources/';
+    const NOMBRE_MAX_FILPILOTE = 7;
+    const CHEMIN_FICHIERJSON = '/usr/share/nginx/www/jeedom/plugins/racoon/core/config/';
 
 
     /*     * ***********************Methode static*************************** */
@@ -54,208 +52,221 @@ class racoon extends eqLogic {
      * Méthode appelée par le système toutes les minutes
      *
      */
-      public static function cron() {
-          self::getVariable();
-      }
+public static function cron() {
+  if(is_object($racoonSparkCore = self::byLogicalId('sparkCore','racoon'))) {
+    try {
+      $resultatRequete = self::requeteInformationSparkCore();
+      self::traitementInformationSparkCore($resultatRequete);
+      if($cmdSparkCore = $racoonSparkCore->searchCmdByConfiguration('aRecuperer')) {
+        foreach ($cmdSparkCore as $keyVariable) {
+          if($keyVariable->getConfiguration('aRecuperer') == 1) {
+            if($resultatRequete = self::requeteVariableSparkCore($keyVariable->getName())) {
+              $keyVariable->setConfiguration('value',$resultatRequete);
+              $keyVariable->save();
+              $keyVariable->event($resultatRequete);
+              switch ($keyVariable->getConfiguration('utiliserPar')) {
+                case 'filPilote':
+                  self::traitementFilPilote($resultatRequete);
+                break;
+                case 'teleinfo':
+                  self::traitementTeleinfo($resultatRequete);
+                break;
+                case 'temperature':
+                  self::traitementTemperature($resultatRequete);
+                break;
+              }
+            }
+          }
+        }  
+      }  
+    } catch (Exception $e) {
 
+    }
+  }
+}
+
+ ////////////////////////////////////////////////////////////////////////
+//  Méthodes des créations des eqLogics et commandes
+/////////////////////////////////////////////////////////////////////////
   /**
      * Ajout de tous les objets du plugin appelé après la sauvegarde de la configuration
      *
+     * @param string $typeEquipement Correspond au type de d'équipement à créer.
+     *
+     * @param int $nombreEquipement correspond au nombre d'équipement d'un type à créer
      *
      * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
-    public static function creationEquipement() {
-      log::add('racoon','debug','Appel de creationEquipement');
-      log::add('racoon','info','Création des objets');
+public static function creationEquipement($typeEquipement,$nombreEquipement) {
+      log::add('racoon','DEBUG','[Appel] creationEquipement avec les paramètres, typeEquipement :' . $typeEquipement . ' & nombreEquipement à créer' . $nombreEquipement);
       if($equipement = self::getConfigJSON('equipement')) {
-        foreach ($equipement as $keyEquipement) {
-           $commande = $keyEquipement['commande'];
-           $configuration = $keyEquipement['configuration'];
-           $racoon = self::byLogicalId($keyEquipement['logicalId'], 'racoon');
-           if(!is_object($racoon)) {
-                $racoon = new racoon();
-                $racoon->setEqType_name($keyEquipement['eqType_name']);
-                $racoon->setName($keyEquipement['name']);
-                $racoon->setLogicalId($keyEquipement['logicalId']);
-                $racoon->setIsEnable($keyEquipement['isEnable']);
-                foreach ($configuration as $keyConfiguration) {
-                  $racoon->setConfiguration($keyConfiguration['name'],$keyConfiguration['value']);
-                }
-                $racoon->save();
-                log::add('racoon', 'info',print_r($racoon,true));
-           } else {
-                log::add('racoon','debug','objet ' . $racoon->getName() .' déjà crée');
-           }
-           self::creationCommande($racoon,$commande);
-        }
+      for($iNbEqui = 1 ; $iNbEqui <= $nombreEquipement ; $iNbEqui ++) {
+        $keyEquipement = $equipement[$typeEquipement];
+        $configuration = $keyEquipement['configuration'];
+        if($nombreEquipement == 1 && $keyEquipement['isUnique'] == 1)
+          $racoon = self::byLogicalId($keyEquipement['logicalId'], 'racoon');
+        else
+          $racoon = self::byLogicalId($keyEquipement['logicalId'] . $iNbEqui,'racoon');
+        if(!is_object($racoon)) {
+          $racoon = new racoon();
+          $racoon->setEqType_name($keyEquipement['eqType_name']);
+          if($nombreEquipement == 1 && $keyEquipement['isUnique'] == 1) {
+          $racoon->setName($keyEquipement['name']);
+          $racoon->setLogicalId($keyEquipement['logicalId']);
+          } else {
+          $racoon->setName($keyEquipement['name'] . ' ' . $iNbEqui);
+          $racoon->setLogicalId($keyEquipement['logicalId'] . $iNbEqui);
+          }
+          $racoon->setIsEnable($keyEquipement['isEnable']);
+          foreach ($configuration as $keyConfiguration) {
+            if($keyConfiguration['value'] == "variableINbEqui")
+            $racoon->setConfiguration($keyConfiguration['name'],$iNbEqui);
+            else
+            $racoon->setConfiguration($keyConfiguration['name'],$keyConfiguration['value']);
+          }
+          $racoon->save();
+            log::add('racoon','DEBUG','[Data] Equipement : ' . print_r($racoon,true));
+          } else {
+            log::add('racoon','DEBUG','[Equipement] ' . $racoon->getName() .' déjà crée');
+          }
+          if(count($keyEquipement['commande']) != 0)
+            self::creationCommande($racoon,$typeEquipement);
+      }
+        log::add('racoon','INFO','[Succès] Création de l\'équipement ' . $racoon->getName() . ' réussie');
         return true;
       } else {
-        log::add('racoon','error','Fichier JSON pour les équipements n\'est pas sous le bon format ou n\'existe pas ');
-        throw new Exception(__('Fichier JSON pour les équipements n\'est pas sous le bon format ou n\'existe pas ', __FILE__));
+        log::add('racoon','ERROR','[Config] Fichier JSON');
+        return false;
       }
-  } 
+} 
 
   /**
      * Création des commandes par rapport aux objets
      *
-     * @param racoon $racoon
+     * @param racoon $equipRacoon correspond au racoon sur lequel les commandes vont être créer.
      *
-     * @param array $listeCommande liste des commandes pour l'objet racoon
+     * @param string $typeEquipement correspond au type de l'équipement pour récupérer les commandes par rapport à cet type.
      *
      * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
-    public static function creationCommande($objetRacoon,$listeCommande)
+    public static function creationCommande($equipRacoon,$typeEquipement,$nomCommande = null)
     {
-        log::add('racoon','debug','Appel de creationCommande');
-        log::add('racoon','info','Création des commandes pour l\'objet ' . $objetRacoon->getName());
+        log::add('racoon','DEBUG','[Appel] creationCommande avec les paramètres, Object Racoon : ' . print_r($equipRacoon,true) . ' &  type d\'équipement : ' . $typeEquipement . ' & nomCommande : ' . $nomCommande);
         if ($commande = self::getConfigJSON('commande')) {
-        foreach ($listeCommande as $keyCommandeACreer) {
-          $racoonCmd = racoonCmd::byEqLogicIdCmdName($objetRacoon->getId(),$commande[$keyCommandeACreer['num']]['name']);
+          //$typeCommande = $commande[$typeEquipement];
+        foreach ($commande[$typeEquipement] as $typeCommande) {
+          $racoonCmd = racoonCmd::byEqLogicIdCmdName($equipRacoon->getId(),$typeCommande['name']);
            if(!is_object($racoonCmd)) {
                 $racoonCmd = new racoonCmd();
-                $racoonCmd->setName($commande[$keyCommandeACreer['num']]['name']);
-                $racoonCmd->setEqLogic_id($objetRacoon->getId());
-                $racoonCmd->setEqType($commande[$keyCommandeACreer['num']]['eqType']);
-                $racoonCmd->setLogicalId($commande[$keyCommandeACreer['num']]['logicalId']);
-                $racoonCmd->setType($commande[$keyCommandeACreer['num']]['type']);
-                foreach ($commande[$keyCommandeACreer['num']]['configuration'] as $keyConfiguration) {
+                if(isset($nomCommande)) {
+                  $racoonCmd->setName($nomCommande);
+                  $racoonCmd->setLogicalId($nomCommande);
+                } else {
+                  $racoonCmd->setName($typeCommande['name']);
+                  $racoonCmd->setLogicalId($typeCommande['logicalId']);
+                }
+                $racoonCmd->setEqLogic_id($equipRacoon->getId());
+                $racoonCmd->setEqType($typeCommande['eqType']);
+                $racoonCmd->setType($typeCommande['type']);
+                foreach ($typeCommande['configuration'] as $keyConfiguration) {
                    $racoonCmd->setConfiguration($keyConfiguration['name'],$keyConfiguration['value']);    
                 }
-                $racoonCmd->setSubType($commande[$keyCommandeACreer['num']]['subType']);
-                $racoonCmd->setDisplay('generic_type',$commande[$keyCommandeACreer['num']]['display']);
-                $racoonCmd->setUnite($commande[$keyCommandeACreer['num']]['unite']);
+                $racoonCmd->setSubType($typeCommande['subType']);
+                $racoonCmd->setDisplay('generic_type',$typeCommande['display']);
+                $racoonCmd->setUnite($typeCommande['unite']);
                 $racoonCmd->save();
-                log::add('racoon', 'info',   print_r($racoonCmd,true));
+                log::add('racoon','DEBUG','[Data] Commande : '  . print_r($racoonCmd,true));
+                log::add('racoon','INFO','[Succès] Création de la commande ' . $racoonCmd->getName() . ' du racoon ' . $equipRacoon->getName());
             } else {
-              log::add('racoon','debug','Commande ' . $racoonCmd->getName() . ' déjà crée');
+              log::add('racoon','DEBUG','[Commande] ' . $racoonCmd->getName() . ' déjà crée');
             }
         }
+        log::add('racoon','INFO','[Succès] Création des commandes pour l\'équipement Racoon ' . $equipRacoon->getName() . ' réussie');
         return true;
       } else {
-        log::add('racoon','error','Fichier JSON pour les commandes n\'est pas sous le bon format ou n\'existe pas');
-         throw new Exception(__('Fichier JSON pour les commandes n\'est pas sous le bon format ou n\'existe pas ', __FILE__));
+        log::add('racoon','ERROR','[Config] Fichier JSON');
+        return false;
        }
     }
 
+ ////////////////////////////////////////////////////////////////////////
+//  Méthodes des get de config (JSON dans le dossier config et les données sur la page de config)
+/////////////////////////////////////////////////////////////////////////
+
   /**
-     * Configuration de l'objet Spark Core (utilisé dans les méthodes call et getStatut)
+     * Récupération depuis les fichiers JSON, des informations correspondant soit aux équipements, aux commandes et aux nombre de fil pilotes.
      *
-     * @see https://secure.php.net/manual/fr/function.json-last-error.php Pour les codes d'erreur JSON
+     * @see https://secure.php.net/manual/fr/function.json-last-ERROR.php Pour les codes d'erreur JSON
      *
-     * @param string $what le nom du tableau à récuperer dans le fichier JSON, soit 'objet' pour récupérer tous les objets à créer soit toutes les commandes disponibles
+     * @param string $element le nom du fichier où il faut récupérer les informations.
      *
-     * @return array $objet|$commande selon le paramètre
+     * @return array $resultat résultat de la récupération des données de la config JSON selon l'élèment
      *
      */
-  public static function getConfigJSON($element)
-  {
-      log::add('racoon','debug','Appel de getConfigJSON avec en paramètre, l\'élèment à récupérer : ' . $element);
-        if(file_get_contents(self::CHEMIN_FICHIERJSON . $element . '.json') == TRUE) {
-            log::add('racoon','debug','fichier JSON récupéré');
+  public static function getConfigJSON($element) {
+      log::add('racoon','DEBUG','[Appel] getConfigJSON avec le paramètre, fichier : ' . $element);
+        if(file_get_contents(self::CHEMIN_FICHIERJSON . $element . '.json') == FALSE) {
+            log::add('racoon','ERROR','[Fichier] ' . $element . '.json introuvable');
+            return false;
+        } else {
             $json_source = file_get_contents(self::CHEMIN_FICHIERJSON . $element . '.json');
-            if(json_decode($json_source,TRUE) == TRUE) {
+            if(json_decode($json_source,TRUE) == FALSE) {
+              log::add('racoon','ERROR','[JSON] [CODE] ' . json_last_error()); 
+              return false;           
+            } else {
               $data = json_decode($json_source,TRUE);
               switch ($element) {
                 case 'equipement':
                     $equipement = $data['equipement'];
+                    log::add('racoon','DEBUG','[Data] Array équipement ' . print_r($equipement,true));
+                    log::add('racoon','INFO','[Succès] Récupération des données du fichierJSON ' . $element . ' réussie');
                     return $equipement;
                     break;
                 case 'commande':
                     $commande = $data['commande'];
+                    log::add('racoon','DEBUG','[Data] Array commande ' . print_r($commande,true));
+                    log::add('racoon','INFO','[Succès] Récupération des données du fichierJSON ' . $element . ' réussie');
                     return $commande;
                     break;
-                case 'nombreFilPilote':
-                    $nombreFilPilote = $data['nombreFilPilote'];
-                    return $nombreFilPilote;
-                    break;
               }
-            } else {
-              log::add('racoon','error','Erreur dans le fichier JSON ' . json_last_error());
-              throw new Exception(__('Erreur dans le fichier JSON ' . json_last_error(), __FILE__));
-              return false;
             }
-        }
-        else {
-            log::add('racoon','error','Fichier JSON introuvable');
-            throw new Exception(__('Fichier JSON introuvable', __FILE__));
-            return false;
         }
   }
  /**
-     * Configuration de l'objet Spark Core (utilisé dans les méthodes call et getStatut)
-     *
-     * @see https://secure.php.net/manual/fr/function.json-last-error.php Pour les codes d'erreur JSON
-     *
-     * @param string $what le nom du tableau à récuperer dans le fichier JSON, soit 'objet' pour récupérer tous les objets à créer soit toutes les commandes disponibles
+     * Récupération à partir de la page de configuration, des informations sur le Spark Core.
      *
      * @return array $objet|$commande selon le paramètre
      *
      */
 public static function getConfigSparkCore() {
-    log::add('racoon','debug','Appel de getConfigSparkCore');
-    $deviceId = config::byKey('deviceid','racoon',0);
-    $accessToken = config::byKey('accessToken','racoon',0);
-    if(is_string($deviceId) && is_string($accessToken))
-      return $config = array($deviceId,$accessToken);
-    else {
-      log::add('racoon','error','Erreur de la configuration du Spark Core');
-      throw new Exception(__('Erreur de la configuration du Spark Core ', __FILE__));
+    log::add('racoon','DEBUG','[Appel] getConfigSparkCore sans paramètre');
+    $deviceId = config::byKey('deviceid','racoon');
+    $accessToken = config::byKey('accessToken','racoon');
+    log::add('racoon','DEBUG','[Data] DeviceID du spark core : ' . $deviceId . ', accessToken : ' . $accessToken);
+    if(is_string($deviceId) && is_string($accessToken)) {
+      $racoonSparkCore = self::byLogicalId('sparkCore','racoon');
+      if(is_object($racoonSparkCore)) {
+        $racoonSparkCore->setConfiguration('deviceId',$deviceId);
+        $racoonSparkCore->setConfiguration('accessToken',$accessToken);
+        $racoonSparkCore->save();
+        log::add('racoon','INFO','[Succès] Récupération des données de configuration du Spark Core réussie');
+        return true;
+      } else {
+        log::add('racoon','ERROR','[Equipement] Racoon SparkCore n\'existe pas');
+        return false;
+      }
+    } else {
+      log::add('racoon','ERROR','[Config] Données page de configuration non-conformes');
+      return false;
       }
     }
- /**
-     * Configuration de l'objet Spark Core (utilisé dans les méthodes call et getStatut)
-     *
-     * @see https://secure.php.net/manual/fr/function.json-last-error.php Pour les codes d'erreur JSON
-     *
-     * @param string $what le nom du tableau à récuperer dans le fichier JSON, soit 'objet' pour récupérer tous les objets à créer soit toutes les commandes disponibles
-     *
-     * @return array $objet|$commande selon le paramètre
-     *
-     */
-public static function getConfigFonctionnalite() {
-  log::add('racoon','debug','Appel de getConfigFonctionnalite');
-  $fonctTeleinfo =  config::byKey('teleinfo','racoon',0);
-  $fonctRegulation =  config::byKey('regulation','racoon',0);
-  $fonctFilPilote =  config::byKey('filPilote','racoon',0);
- if(in_array($fonctTeleinfo,self::$_activerFonctionnalite) && in_array($fonctRegulation,self::$_activerFonctionnalite)  && in_array($fonctFilPilote,self::$_activerFonctionnalite))
-    return $config = array($fonctTeleinfo,$fonctRegulation,$fonctFilPilote);
-else {
-  log::add('racoon','error','Erreur de la configuration des fonctionnalités du plugin');
-  throw new Exception(__('Erreur de la configuration des fonctionnalités du plugin ', __FILE__));
-  }
-}
+//
 
-public static function getConfigRegulation() {
-  log::add('racoon','debug','Appel de getConfigFonctionnalite');
-  $Kp =  config::byKey('Kp','racoon',0);
-  $Ki =  config::byKey('Ki','racoon',0);
-  $Kd =  config::byKey('Kd','racoon',0);
-  $limiteTempMin = config::byKey('limiteTempMin','racoon',0);
-  $limiteTempMax = config::byKey('limiteTempMax','racoon',0);
-  return $config = array($Kp,$Ki,$Kd,$limiteTempMin,$limiteTempMax);
-}
- /**
-     * Configuration de l'objet Spark Core (utilisé dans les méthodes call et getStatut)
-     *
-     * @see https://secure.php.net/manual/fr/function.json-last-error.php Pour les codes d'erreur JSON
-     *
-     * @param string $what le nom du tableau à récuperer dans le fichier JSON, soit 'objet' pour récupérer tous les objets à créer soit toutes les commandes disponibles
-     *
-     * @return array $objet|$commande selon le paramètre
-     *
-     */
-public static function getNombreFilPilote() {
-  log::add('racoon','debug','Appel de getConfigSparkCore');
-   if ($nombreFilPilote = self::getConfigJSON('nombreFilPilote') && is_int($nombreFilPilote)) {
-          return $nombreFilPilote;
-   } else {
-      log::add('racoon','error','Fichier JSON pour le nombre de fil pilote n\'est pas sous le bon format ou n\'existe pas ');
-      throw new Exception(__('Fichier JSON pour le nombre de fil pilote n\'est pas sous le bon format ou n\'existe pas ', __FILE__));
-   }
-       
-}
+////////////////////////////////////////////////////////////////////////
+//  Méthode de la configuration d'un objet phpSpark pour la communication avec le Spark Core
+/////////////////////////////////////////////////////////////////////////
 
   /**
      * Configuration de l'objet Spark Core (utilisé dans les méthodes call et getStatut)
@@ -267,8 +278,8 @@ public static function getNombreFilPilote() {
      * @return phpSpark $spark Objet de la librairie phpParticle
      *
      */
-    public static function configurationSparkCore($accessToken){
-      log::add('racoon','debug','Appel de configurationSparkCore avec en paramètre l\'access Token : ' .$accessToken);
+    public static function configurationPhpParticle($accessToken){
+      log::add('racoon','DEBUG','[Appel] ConfigurationSparkCore avec le paramètre, accessToken : ' .$accessToken);
       $spark = new phpSpark();
       $spark->setDebug(false);
       $spark->setDebugType("TXT");
@@ -277,206 +288,271 @@ public static function getNombreFilPilote() {
       return $spark;
     }
 
+ ////////////////////////////////////////////////////////////////////////
+//  Méthodes des requêtes vers le Spark Core
+/////////////////////////////////////////////////////////////////////////
     /**
-     * Vérifie les données sur la page de configuration 
-     *
-     * @return boolean $bool 
-     *
-     */
-    public static function checkConfig()
-    {
-      $config = self::getConfigSparkCore();
-      $spark = self::configurationSparkCore();
-      if($spark->signalDevice($config[self::$_idSpark["device_id"]],1) == true) {
-        $spark->debug_r($spark->getResult());
-      } else {
-        log::add('racoon','error','La connexion avec le Spark Core n\'a pas été établi, vérifier les identifiants');
-        throw new Exception(__('La connexion avec le Spark Core n\'a pas été établi, vérifier les identifiants', __FILE__));
-      }
-      return TRUE;
-    }
-  /**
-     * Configuration de l'objet Spark Core (utilisé dans les méthodes call et getStatut)
-     *
-     * @see https://secure.php.net/manual/fr/function.json-last-error.php Pour les codes d'erreur JSON
-     *
-     * @param string $what le nom du tableau à récuperer dans le fichier JSON, soit 'objet' pour récupérer tous les objets à créer soit toutes les commandes disponibles
-     *
-     * @return array $objet|$commande selon le paramètre
-     *
-     */
-   public static function getVariable()
-    {
-      log::add('racoon','debug','Appel de getVariable');
-      $config = self::getConfigFonctionnalite();
-      if($config[self::$_fonctionnalite["fonction_teleinfo"]]) {
-        $variableSparkCore = "teleinfo";
-        if($resultat = self::requeteVariableSparkCore($variableSparkCore)) {
-          if(isset($resultat) && (json_decode($resultat))) { 
-            self::getTeleinfo($resultat); 
-          } else { 
-            log::add('racoon','error','Format du résultat invalide pour les teleinfo'); 
-          }
+    *
+    * Requête effectué sur le Spark Core pour récupérer ses informations getDeviceInfo()
+    *
+    * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
+    *
+    * @return array $data Renvoit les informations récupérées de la requête
+    *
+    */
+  public static function requeteInformationSparkCore()
+  {
+      log::add('racoon','DEBUG','[Appel] requeteInformationSparkCore() sans paramètre');
+      $logical = 'sparkCore';
+      $racoonSparkCore = self::byLogicalId($logical,'racoon');
+      $spark = self::configurationPhpParticle($racoonSparkCore->getConfiguration('accessToken'));
+      if($spark->getDeviceInfo($racoonSparkCore->getConfiguration('deviceId')) == true) {
+        $data = $spark->getResult();
+        log::add('racoon','INFO','[Succès] Requête HTTP sur le Spark Core pour récupérer ses informations réussie');
+        log::add('racoon','DEBUG','[Data] Données reçues du Spark Core : ' . print_r($data,true));
+        return $data;
+        } else {
+          log::add('racoon','ERROR','[Requête] Erreur d\'appel des informations du Spark Core [Code] : ' . $spark->getError() . ' [Source] : ' . $spark->getERRORSource());
+          return false;
         }
-      } else { 
-        log::add('racoon','debug','Fonctionnalite Teleinfo non-activer'); 
-      }
-
-      if($config[self::$_fonctionnalite["fonction_regulation"]]) {
-        $variableSparkCore = "temperature";
-        if($resultat = self::requeteVariableSparkCore($variableSparkCore)) {
-           if(isset($resultat) && is_int($resultat)) { 
-            self::getTemperature($resultat);
-          } else { 
-            log::add('racoon','error','Format du résultat invalide pour la température'); 
-          }
-        }
-      } else { 
-        log::add('racoon','debug','Fonctionnalite Régulation non-activer'); 
-      }
-
-      if($config[self::$_fonctionnalite["fonction_filPilote"]]) {
-        $variableSparkCore = "etatFp";
-        if($resultat = self::requeteVariableSparkCore($variableSparkCore)) {
-            if(isset($resultat) && is_string($resultat) && (strlen($resulat) == self::getNombreFilPilote())) {
-              self::getTemperature($resultat);
-            } else { 
-              log::add('racoon','error','Format du résultat invalide pour les fils pilotes'); 
-            }
-        } 
-      } else { 
-          log::add('racoon','debug','Fonctionnalite Fil Pilote non-activer'); 
-        }      
+        
   }
   /**
-     * Configuration de l'objet Spark Core (utilisé dans les méthodes call et getStatut)
+     * Requête envoyé au Spark Core pour une variable selon un paramètre, le nom de la variable.
      *
-     * @see https://secure.php.net/manual/fr/function.json-last-error.php Pour les codes d'erreur JSON
+     * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
      *
-     * @param string $what le nom du tableau à récuperer dans le fichier JSON, soit 'objet' pour récupérer tous les objets à créer soit toutes les commandes disponibles
+     * @param string $fonctionSparkCore correspond au nom de la fonction appelé sur le Spark Core
      *
-     * @return array $objet|$commande selon le paramètre
+     * @return array $resultat récupère les résultats de la requête de la variable SINON 
      *
      */
     public static function requeteVariableSparkCore($variableSparkCore)
     {
-      log::add('racoon','debug','Appel de requeteVariableSparkCore avec en paramètre, variable du Spark Core : ' . $variableSparkCore);
-      $config = self::getConfigSparkCore();
-      $spark = self::configurationSparkCore($config[self::$_idSpark["access_token"]]);
-       if ($spark->getVariable($config[self::$_idSpark["device_id"]],$variableSparkCore) == true) {
-        $data = $spark->getResult();
-        $resultat = $data['result'];
-        log::add('racoon','info','Data reçu du Spark Core :' . $resultat);
+      log::add('racoon','DEBUG','[Appel] requeteVariableSparkCore avec le paramètre, variableSparkCore : ' . $variableSparkCore);
+      if(is_string($variableSparkCore)){
+        $racoonSparkCore = self::byLogicalId('sparkCore','racoon');
+        $spark = self::configurationPhpParticle($racoonSparkCore->getConfiguration('accessToken'));
+        if($spark->getVariable($racoonSparkCore->getConfiguration('deviceId'),$variableSparkCore) == true) {
+          log::add('racoon','INFO','[Succès] Requête HTTP sur le Spark Core pour récupérer la valeur de la variable ' . $variableSparkCore . ' sur le Spark Core réussie');
+          $data = $spark->getResult();
+          $resultat = $data['result'];
+          log::add('racoon','DEBUG','[Data] Valeur de la variable ' . $variableSparkCore . ' : ' . $resultat);
         } else {
-          log::add('racoon','error','Erreur d\'appel de la variable ' . $variableSparkCore. ' , ' . $spark->getError() . ' source ' . $spark->getErrorSource());
-          return false;
+            log::add('racoon','ERROR','[Requête] Erreur d\'appel de la variable ' . $variableSparkCore. ' [Code] : ' . $spark->getError() . ' [Source] : ' . $spark->getErrorSource());
+            return false;
         }
-        return $resultat;
+          return $resultat;
+      }
     }
  /**
-     * Configuration de l'objet Spark Core (utilisé dans les méthodes call et getStatut)
-     *
-     * @see https://secure.php.net/manual/fr/function.json-last-error.php Pour les codes d'erreur JSON
-     *
-     * @param string $what le nom du tableau à récuperer dans le fichier JSON, soit 'objet' pour récupérer tous les objets à créer soit toutes les commandes disponibles
-     *
-     * @return array $objet|$commande selon le paramètre
-     *
-     */
-    public static function requeteFonctionSparkCore($fonctionSparkCore,$parametre)
-    {
-      log::add('racoon','debug','Appel de requeteVariableSparkCore avec en paramètre, méthode du Spark Core :' . $fonctionSparkCore . ' et le(s) paramètre(s) : ' . $parametre);
-      $config = self::getConfigSparkCore();
-      $spark = self::configurationSparkCore($config[self::$_idSpark["access_token"]]);
-       if($spark->callFunction($config[self::$_idSpark["device_id"]],$fonctionSparkCore,$parametre) == true) {
-          log::add('racoon','info','Commande envoye au Spark Core');
-        } else {
-          log::add('racoon','error','Erreur d\'appel de la fonction '. $fonctionSparkCore .' ' . $spark->getError() . ' source ' . $spark->getErrorSource());
-          return false;
-        }
-        return true;
-    }
-   /**
-     * Récupération des statut des zones des radiateurs de la maison.
+     * Requête envoyé au Spark Core pour une fonction selon deux paramètres, le nom et les paramètres de la fonction.
      *
      * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
+     *
+     * @param string $fonctionSparkCore correspond au nom de la fonction appelé sur le Spark Core
+     *
+     * @param string $parametre correspond aux paramètres à envoyer à la fonction sur le Spark Core
+     *
+     * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log.
+     *
+     */
+    public static function requeteFonctionSparkCore($fonctionSparkCore,$parametre) {
+      log::add('racoon','DEBUG','[Appel] requeteFonctionSparkCore avec les paramètres, fonctionSparkCore ' . $fonctionSparkCore . ' & les paramètres ' . $parametre);
+      if(is_string($fonctionSparkCore) && is_string($parametre)) {
+        $racoonSparkCore = self::byLogicalId('sparkCore','racoon');
+        $spark = self::configurationPhpParticle($racoonSparkCore->getConfiguration('accessToken'));
+        if($spark->callFunction($racoonSparkCore->getConfiguration('deviceId'),$fonctionSparkCore,$parametre) == true) {
+          log::add('racoon','INFO','[Succès] Requête HTTP sur le Spark Core pour faire appel à la fonction ' . $fonctionSparkCore . ' avec les paramètres : ' . $parametre . 'réussie');
+          return true;
+        } else {
+          log::add('racoon','ERROR','[Requête] Erreur d\'appel de la fonction '. $fonctionSparkCore . ' [Code] :' . $spark->getError() . ' [Source] : ' . $spark->getErrorSource());
+          return false;
+        }
+      } else {
+        log::add('racoon','ERROR','[Paramètres] Non-conformes');
+        return false;
+      }
+    }
+/**
+public static function supprimerCommandeSparkCore($variables,$fonctions) {
+  log::add('racoon','DEBUG','Appel de supprimerCommandeSparkCore avec les paramètres : ' . print_r($variables) . ' & ' . print_r($fonctions));
+  $racoonSparkCore = self::getRacoonSparkCore();
+  $racoonCmdSparkCore = self::getCmd();
+  //array_intersect(array1, array2) A REGARDER
+  foreach ($racoonCmdSparkCore as $keyRacoonCmdSparkCore) {
+    foreach ($variables as $keyVariable) {
+      if($keyRacoonCmdSparkCore)
+    }
+  }
+
+}
+**/
+////////////////////////////////////////////////////////////////////////
+//  Méthodes des traitements des résultats des requêtes effectuées au Spark Core
+/////////////////////////////////////////////////////////////////////////
+/**
+*
+* Traitement de la requête pour récupérer les informations du Spark Core, les fonctions et variables sont enregistrées en tant que commande de l'eqLogic sparkCore
+*
+* @param array $resultatRequete correspond au résultat de la requête pour récupérer les informations du SPark Core
+*
+* @param string $typeEquipement correspond au type de racoon qui demande les informations du Spark Core
+*
+* @param string $variable correspond à la variable qu'un type de racoon demande à récupérer toutes les minutes
+*
+* @param string $fonction correspond à la fonction qu'un type de racoon demande à utiliser pour la fonctionnalité correspondant au type d'équipement
+*
+*/
+    public static function traitementInformationSparkCore($resultatRequete) {
+      log::add('racoon','DEBUG','[Appel] traitementInformationSparkCore() avec es paramètre, résultat de la requête : ' . print_r($resultatRequete,true));
+      $typeEquipement = 'sparkCore';
+      $racoonSparkCore = self::byLogicalId('sparkCore','racoon');
+      if($resultatRequete != null && is_array($resultatRequete)) {
+        if(is_object($racoonSparkCore)) {
+        $variables = $resultatRequete['variables'];
+        if (count($variables) != 0) {
+          foreach ($variables as $keyVariable => $type) {
+            log::add('racoon','DEBUG','Retour informations variables ' . $keyVariable);
+            $commandeVariable = racoonCmd::byEqLogicIdCmdName($racoonSparkCore->getId(),$keyVariable);
+            if(!is_object($commandeVariable))
+              self::creationCommande($racoonSparkCore,$typeEquipement . 'Variable',$keyVariable);
+          }
+        }
+        $fonctions = $resultatRequete['functions'];
+        if(count($fonctions) != 0) {
+            foreach ($fonctions as $keyFonction){
+            log::add('racoon','DEBUG','Retour informations fonctions ' . $keyFonction);
+            if(!is_object(racoonCmd::byEqLogicIdCmdName($racoonSparkCore->getId(),$keyFonction)))
+              self::creationCommande($racoonSparkCore,$typeEquipement . 'Fonction',$keyFonction);
+          }
+        }  
+        log::add('racoon','INFO','[Succès] Traitement des informations du Spark Core réussi');
+        //self::supprimerCommandeSparkCore($variables,$fonctions);
+        return true;
+      } else {
+        log::add('racoon','ERROR','[Equipement] Racoon SparkCore n\'existe pas');
+        return false;
+      }
+    } else
+      log::add('racoon','ERROR','[Traitement] Informations du Spark Core non-conforme');
+      return false;
+  }
+   /**
+     * Traitement de la requête sur la variable correspondant aux statuts des fil pilotes
+     *
+     * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
+     *
+     * @param string $resultatRequete correspond au traitement de la requête pour récupérer la variable correspondant à la fonctionnalité FilPilote c'est à dire les status des fil pilotes
      *
      * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
-   public static function getStatut($resultatRequete) {
-      log::add('racoon','debug','Appel de getStatut() avec en paramètre, résultat de la requête : ' . print_r($resultatRequete,true));
-      for ($izone= NOMBRE_MINI_FILPILOTE; $izone < self::getNombreFilPilote() ; $izone++) { 
-        $sparkZone = $izone-1;
-        $valeur = $resultatRequete[$sparkZone];
-        $logical = 'zone' . $izone;
-        log::add('racoon','debug','Retour statut zone ' . $izone . ' valeur ' . $valeur);
-        $racoon = self::byLogicalId($logical,'racoon');
-        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
-        $racoonCmd->setConfiguration('value',$valeur);
-        $racoonCmd->save();
-        $racoonCmd->event($valeur);
-        $izone++;
+   public static function traitementFilPilote($resultatRequete) {
+      log::add('racoon','DEBUG','[Appel] traitementStatut() avec les paramètres, résultat de la requête :' . print_r($resultatRequete,true));
+      if(is_string($resultatRequete)) {
+        for($izone= self::NOMBRE_MINI_FILPILOTE; $izone <= self::NOMBRE_MAX_FILPILOTE ; $izone++) { 
+          $sparkZone = $izone-1;
+          $valeur = $resultatRequete[$sparkZone];
+          $logical = 'zone' . $izone;
+          $racoon = self::byLogicalId($logical,'racoon');
+          log::add('racoon','DEBUG','[Data] Retour statut zone ' . $izone . ' valeur ' . $valeur);
+            if(is_object($racoon)) {
+              $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
+              //$racoonCmd->setValue($valeur);
+              $racoonCmd->setConfiguration('value',$valeur);
+              $racoonCmd->save();
+              $racoonCmd->event($valeur);
+              log::add('racoon','INFO','[Succès] Traitement Fil Pilote réussi');
+            } else {
+              log::add('racoon','ERROR','[Equipement] Zone '. $izone . ' n\'existe pas');
+              return false;
+            }
+        }
+        return true;
+      } else {
+        log::add('racoon','ERROR','[Traitement] Informations \'Fil Pilote\' du Spark Core récupérés non-conformes');
+        return false;
       }
-      return true;
    }
    /**
      * Récupération de la température enregistrée sur le Spark Core grâve au module 433MHz
      *
      * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
      *
+     * @param int $resultatRequete correspond au traitement de la requête pour récupérer la variable correspondant à la fonctionnalité Temperature c'est à dire les status des fil pilotes
+     *
      * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
-   public static function getTemperature($resultatRequete) {
-      log::add('racoon','debug','Appel de getTemperature() avec en parametre, résultat de la requête : ' . print_r($resultatRequete,true));
-      $logical = 'temperature';
-      $racoon = self::byLogicalId($logical,'racoon');
-      $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),$logical);
-      $racoonCmd->setConfiguration('value',$resultatRequete);
-      $racoonCmd->save();
-      $racoonCmd->event($resultatRequete);
-      return true;
+   public static function traitementTemperature($resultatRequete) {
+      log::add('racoon','DEBUG','[Appel] traitementTemperature() avec le paramètre, résultat de la requête :' . print_r($resultatRequete,true));
+      if(is_int($resultatRequete)) {
+        $racoon = self::byLogicalId('temperature','racoon');
+        if(is_object($racoon)) {
+          $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'temperature');
+          //$racoonCmd->setValue($resultatRequete);
+          $racoonCmd->setConfiguration('value',$resultatRequete);
+          $racoonCmd->save();
+          $racoonCmd->event($resultatRequete);
+          log::add('racoon','INFO','[Succès] Traitement température réussi');
+          return true;
+        } else {
+            log::add('racoon','ERROR','[Equipement] Temperature n\'existe pas');
+            return false;
+        }
+      } else {
+          log::add('racoon','ERROR','[Traitement] Informations \'Température\' du Spark Core récupérés non-conformes');
+          return false;
+      }
     }
      /**
      * Récupération des téléinfos enregistrées sur le Spark Core
      *
      * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
      *
+     * @param json $resultatRequete correspond au traitement de la requête pour récupérer la variable correspondant à la fonctionnalité Teleinfo c'est à dire les status des fil pilotes
+     *
      * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
-   public static function getTeleinfo($resultatRequete) {
-      log::add('racoon','debug','Appel de getTeleinfo() avec en paramètre, résultat de la requête : ' . print_r($resultatRequete,true));
-      $teleinfo = json_decode($resultatRequete,true); 
-      log::add('racoon','debug','Retour teleinfo traité' . print_r($teleinfo,true));
-      $racoon = self::byLogicalId('teleinfo','racoon');
-      foreach($teleinfo as $key => $valeur) {
-        log::add('racoon','debug','Retour teleinfo ' . $key . ' valeur ' . $valeur);
-        $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),$key);
-        if(!is_object($racoonCmd))
-        {
-          $racoonCmd = new racoonCmd();
-          $racoonCmd->setName($key);
-          $racoonCmd->setEqLogic_id($racoon->getId());
-          $racoonCmd->setEqType('racoon');
-          $racoonCmd->setLogicalId($key);
-          $racoonCmd->setType('info');
-          $racoonCmd->setSubType('numeric');
-          $racoonCmd->setConfiguration('mode','teleinfo');
+   public static function traitementTeleinfo($resultatRequete) {
+      log::add('racoon','DEBUG','[Appel] traitementTeleinfo() avec le paramètre, résultat de la requête :' . print_r($resultatRequete,true));
+      if(json_decode($resultatRequete,true) == TRUE) {
+        $teleinfo = json_decode($resultatRequete,true); 
+        $typeEquipement = 'teleinfo';
+        $racoon = self::byLogicalId('teleinfo','racoon');
+        if(is_object($racoon)) {
+          foreach($teleinfo as $keyEtiquette => $value) {
+            log::add('racoon','DEBUG','[Data] Retour teleinfo ' . $keyEtiquette . ' valeur ' . $value);
+            $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),$keyEtiquette);
+            if(!is_object($racoonCmd)) {
+              self::creationCommande($racoon,$typeEquipement,$keyEtiquette);
+            }
+            $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),$keyEtiquette);
+            //$racoonCmd->setValue($value);
+            $racoonCmd->setConfiguration('value',$value);
+            $racoonCmd->save();
+            $racoonCmd->event($value);
+          }
+          log::add('racoon','INFO','[Succès] Traitement téléinfo réussi');
+          return true;
+        } else {
+          log::add('racoon','ERROR','[Equipement] Teleinfo n\'existe pas');
+          return false;
         }
-        $racoonCmd->setConfiguration('value',$valeur);
-        $racoonCmd->save();
-        $racoonCmd->event($valeur);
+      } else {
+        log::add('racoon','ERROR','[Traitement] Informations \'Téléinfo\' du Spark Core récupérés non-conformes');
+        return false;
       }
-
-      return true;
     }
+
+////////////////////////////////////////////////////////////////////////
+//  Méthodes des récupération des paramètres pour envoyer au SparkCore
+/////////////////////////////////////////////////////////////////////////
 
    /**
      * Envoi d'ordre $request à la zone $zone via requête HTTP par méthode POST pour les radiateurs.  
-     *
-     * @see https://github.com/harrisonhjones/phpParticle librairie phpParticle pour la classe phpSpark()
      *
      * @param int $zone Variable correspondant au numéro de la zone sélectionnée.
      *
@@ -486,35 +562,73 @@ public static function getNombreFilPilote() {
      *
      */
   public static function setFilPilote($zone,$request) {
-        log::add('racoon','debug','Appel de setFilPilote() avec en paramètre, Commande reçu : ' . $request . '  vers la zone ' . $zone);
-        $parametre = $zone . "," . $request;
-        $fonctionSparkCore = 'setFp';
-        if(self::requeteFonctionSparkCore($fonctionSparkCore,$parametre))
-        {
-          $logical = 'zone' . $zone;
-          $racoon = self::byLogicalId($logical, 'racoon');
-          $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
-          $racoonCmd->setConfiguration('value', $request);
-          $racoonCmd->save();
-          $racoonCmd->event($request);
-          return true;
-        }
-        return false;
-    }
-    
-    public static function setRegulation() {
-      log::add('racoon','debug','Appel de setRegulation()');
-      $config = self::getConfigRegulation();
+        log::add('racoon','DEBUG','[Appel] setFilPilote() avec les paramètres, ordre : ' . $request . ', zone : ' . $zone);
+        if(is_int($zone) && is_string($request)) {
+          $parametre = $zone . $request;
+          $racoonSparkCore = self::byLogicalId('sparkCore','racoon');
+          log::add('racoon','DEBUG',print_r(cmd::searchConfigurationEqLogic($racoonSparkCore->getId(),'utiliserPar','action')));
+         if($cmdSparkCore = cmd::searchConfigurationEqLogic($racoonSparkCore->getId(),'utiliserPar','action')) {
+            foreach ($cmdSparkCore as $cmdFonction) {
+              log::add('racoon','DEBUG','[Data] Fonction Spark Core ' . $cmdFonction->getName());
+              if($cmdFonction->getConfiguration('utiliserPar') == 'filPilote')
+                $fonctionSparkCore = $cmdFonction->getName();
+            }
+          } else {
+             log::add('racoon','ERROR','[Equipement] Spark Core non-configuré');
+             return false;
+          }
+          if(self::requeteFonctionSparkCore($fonctionSparkCore,$parametre)) {
+            $logical = 'zone' . $zone;
+            $racoon = self::byLogicalId($logical, 'racoon');
+            $racoonCmd = racoonCmd::byEqLogicIdAndLogicalId($racoon->getId(),'statut');
+            //$racoonCmd->setValue($request);
+            $racoonCmd->setConfiguration('value', $request);
+            $racoonCmd->save();
+            $racoonCmd->event($request);
+            log::add('racoon','INFO','[Succès] Ordre ' . $request . ' envoyé dans la zone ' . $zone);
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          log::add('racoon','ERROR','[Paramètres] Non-conformes');
 
-      $parametre = $zone . ',' . $request . ',' . $config[self::$_configRegulation["kp"]] . ',' . $config[self::$_configRegulation["ki"]] . ',' . $config[self::$_configRegulation["kd"]] . ',' . $config[self::$_configRegulation["tempMin"]] . ',' . $config[self::$_configRegulation["tempMax"]];
-      $fonctionSparkCore = 'setRegulation';
-       if(self::requeteFonctionSparkCore($fonctionSparkCore,$parametre))
-       {
-        return true;
-       }
-       return false;
+        }
     }
-    
+     /**
+     * Envoi de la consigne $request à la zone $zone via requête HTTP par méthode POST pour les radiateurs avec une config définie par l'utilisateur ou par défaut.  
+     *
+     * @param int $zone Variable correspondant au numéro de la zone sélectionnée.
+     *
+     * @param string $request Variable correspondant de la demande de consigne.
+     *
+     * @return boolean $bool retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
+     *
+     */
+    public static function setRegulation($zone,$request,$temperature,$kp,$ki,$kd) {
+      log::add('racoon','DEBUG','[Appel] de setRegulation()');
+      if(is_int($zone) && is_double($request) && is_double($temperature) && is_double($kp) && is_double($ki) && is_double($kd)) {
+          $parametre = '(' . $zone . '/' . $request . '/' . $temperature . '/' . $kp . '/' . $ki . '/' . $kd . ')';
+        
+        $racoonSparkCore = self::byLogicalId('sparkCore','racoon');
+           if($cmdSparkCore = self::byTypeAndSearhConfiguration('action','utiliserPar')) {
+              foreach ($cmdSparkCore as $cmdFonction) {
+                if($cmdFonction->getConfiguration('utiliserPar') == 'filPilote')
+                  $fonctionSparkCore = $cmdFonction->getName();
+              }
+            } else {
+               log::add('racoon','ERROR','[Equipement] Spark Core non-configuré');
+               return false;
+        }
+        if(self::requeteFonctionSparkCore($fonctionSparkCore,$parametre))
+          log::add('racoon','INFO','[Succès] Régulation demandé à la température ' . $request . ' dans la zone ' . $zone);
+        return true;
+       } else {
+          log::add('racoon','ERROR','[Paramètres] Non-conformes');
+          return false;
+       }
+    }
+  
    
     /*     * *********************Méthodes d'instance************************* */
     /**
@@ -573,45 +687,6 @@ class racoonCmd extends cmd {
 
 
     /*     * *********************Methode d'instance************************* */
- 
-  public static function setIsVisibleCmd()
-    {
-      log::add('racoon','debug','Appel de setIsVisibleCmd');
-      $config = racoon::getConfigFonctionnalite();
-      log::add('racoon','debug',print_r($config,true));
-      $eqLogics = eqLogic::byType('racoon');
-    log::add('racoon','debug','0');
-      foreach ($eqLogics as $racoon) {
-        log::add('racoon','debug','1');
-        $cmdRacoons = cmd::byEqLogicId($racoon->getId());
-        log::add('racoon','debug','2');
-        foreach ($cmdRacoons as $racoonCmd) {
-          log::add('racoon','debug','3');
-        switch ($racoonCmd->getConfiguration('mode')) {
-          case 'teleinfo':
-            $racoonCmd->setIsVisible($config[racoon::$_fonctionnalite["fonction_teleinfo"]]);
-            log::add('racoon','debug',print_r($racoonCmd,true));
-            $racoonCmd->save();
-            break;
-          case 'regulation':
-            $racoonCmd->setIsVisible($config[racoon::$_fonctionnalite["fonction_regulation"]]);
-            log::add('racoon','debug',print_r($racoonCmd,true));
-            $racoonCmd->save();
-            break;
-          case 'filPilote':
-            $racoonCmd->setIsVisible($config[racoon::$_fonctionnalite["fonction_filPilote"]]);
-            log::add('racoon','debug',print_r($racoonCmd,true));
-            $racoonCmd->save();
-            break;
-          default:
-            log::add('racoon','error', 'Type de mode non compatible avec le plugin, voir le fichier commande.json');
-            throw new Exception(__('Type de mode non compatible avec le plugin, voir le fichier commande.json',__FILE__));
-            break;
-        }
-      }
-    }
-  }
-     
    /**
      * Permet l'execution des commandes associées aux objets selon les types de commandes.
      *
@@ -622,8 +697,22 @@ class racoonCmd extends cmd {
      */
     public function execute($_options = array()) {
       $racoon = $this->getEqLogic();
-      log::add('racoon','debug','CMD ' . $this->name . ' en cours');
+      log::add('racoon','DEBUG','[Appel] CMD ' . $this->name  . ' de l\' eqLogic ' . $racoon->getName());
       switch($this->getConfiguration('mode')) {
+       case 'sparkCore' :
+         switch ($this->getType()) {
+            case 'action' :
+              self::requeteFonctionSparkCore($this->getName(),$this->getConfiguration('parametre'));
+              break;
+            case 'info' :
+              if($resultatRequete = self::requeteVariableSparkCore($this->getName())) {
+                $this->setConfiguration('value',$resultatRequete);
+                return $this->getConfiguration('value');
+              }
+              break;
+          }
+        break;
+        
         case 'filPilote' :
           switch ($this->getType()) {
             case 'info' :
@@ -632,16 +721,10 @@ class racoonCmd extends cmd {
             case 'action' :
               $request = $this->getConfiguration('request');
               $zone = $racoon->getConfiguration('zone');
-              if ($zone == '0') {
-                for ($iZone = self::NOMBRE_MINI_FILPILOTE ; $iZone < racoon::getNombreFilPilote() ; $iZone++)
-                  racoon::setFilPilote($iZone,$request);
-              } else {
-                racoon::setFilPilote($zone,$request);
-              }
+              return (racoon::setFilPilote($zone,$request));
             break;
             default:
-              log::add('racoon','error', $this->getType() .': type de commande non-existant pour la fonctionnalité FilPilote dans le plugin');
-              throw new Exception(__($this->getType() .': type de commande non-existant pour la fonctionnalité FilPilote dans le plugin',__FILE__));
+              log::add('racoon','ERROR', $this->getType() .': type de commande non-existant pour la fonctionnalité FilPilote dans le plugin');
             break;
           }
         break;
@@ -652,8 +735,7 @@ class racoonCmd extends cmd {
               return $this->getConfiguration('value');
               break;
             default:
-              log::add('racoon','error', $this->getType() .': type de commande non-existant pour la fonctionnalité Téléinfo dans le plugin');
-              throw new Exception(__($this->getType() .': type de commande non-existant pour la fonctionnalité Téléinfo dans le plugin',__FILE__));
+              log::add('racoon','ERROR', $this->getType() .': type de commande non-existant pour la fonctionnalité Téléinfo dans le plugin');
             break;
           }
         break;
@@ -666,28 +748,28 @@ class racoonCmd extends cmd {
             case 'action':
               switch ($this->getSubType()) {
                 case 'slider':
-                  if($this->getConfiguration('activer') == 1)
-                  $request = 17;
+                  $request = $this->getConfiguration('request');
                   $zone = $racoon->getConfiguration('zone');
+                  $temperature = $this->getConfiguration('temperature');
+                  $kp = $this->getConfiguration('kp');
+                  $ki = $this->getConfiguration('ki');
+                  $kd = $this->getConfiguration('kd');
                   $request = str_replace('#slider#',$_options['slider'],$request);
-                  racoon::setRegulation($zone,$request);
+                  racoon::setRegulation($zone,$request,$temperature,$kp,$ki,$kd);
                 break;
                 default:
-                   log::add('racoon','error', $this->getType() .': sous-type de commande non-existant pour la fonctionnalité FilPilote dans le plugin');
-                   throw new Exception(__($this->getType() .': sous-type de commande non-existant pour la fonctionnalité FilPilote dans le plugin',__FILE__));
+                   log::add('racoon','ERROR', $this->getType() .': sous-type de commande non-existant pour la fonctionnalité FilPilote dans le plugin');
                 break;
               }
             break;
             default:
-              log::add('racoon','error', $this->getType() .': type de commande non-existant pour la fonctionnalité Régulation dans le plugin');
-              throw new Exception(__($this->getType() .': type de commande non-existant pour la fonctionnalité Régulation dans le plugin',__FILE__));
+              log::add('racoon','ERROR', $this->getType() .': type de commande non-existant pour la fonctionnalité Régulation dans le plugin');
             break;
           }
         break;
 
         default :
-          log::add('racoon','error', $this->getConfiguration('mode') .': Mode non-existant dans le plugin (voir la page de configuration du plugin)');
-          throw new Exception(__($this->getConfiguration('mode') .': Mode non-existant dans le plugin (voir la page de configuration du plugin)',__FILE__));
+          log::add('racoon','ERROR', $this->getConfiguration('mode') .': Mode non-existant dans le plugin (voir la page de configuration du plugin)');
         break;
       }
       return true;
