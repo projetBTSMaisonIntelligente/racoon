@@ -1,0 +1,218 @@
+{
+	"commande": {
+		"sparkCoreVariable":[
+			{
+				"_comment": "Commande du plugin Racoon, selon les valeurs récupérés depuis le spark core",
+				"name":"nomCommande",
+				"eqType":"racoon",
+				"logicalId":"nomCommande",
+				"type":"info",
+				"configuration": [
+					{"name":"mode"			,"value":"sparkCore"},
+					{"name":"utiliserPar"	,"value":""},
+					{"name":"aRecuperer"	,"value":false},
+					{"name":"value" 		,"value":""}
+				],
+				"template": [
+					{"key":"","value":""}
+				],
+				"subType":"string",
+				"display":"GENERIC",
+				"unite":""
+			}
+		],
+		"sparkCoreFonction":[
+			{
+				"_comment": "Commande du plugin Racoon, selon les valeurs récupérés depuis le spark core",
+				"name":"nomCommande",
+				"eqType":"racoon",
+				"logicalId":"nomCommande",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"			,"value":"sparkCore"},
+					{"name":"aUtiliser"		,"value":false},
+					{"name":"utiliserPar"	,"value":""},
+					{"name":"parametre" 	,"value":""}
+				],
+				"template": [
+					{"key":"","value":""}
+				],
+				"subType":"other",
+				"display":"MODE_SET_STATE",
+				"unite":""
+			}
+		],
+		"filPilote":[
+			{
+				"_comment": "Commande du plugin Racoon, Confort",
+				"name":"Confort",
+				"eqType":"racoon",
+				"logicalId":"confort",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"		,"value":"filPilote"},
+					{"name":"request"	,"value":"C"}
+				],
+				"template": [
+					{"key":"","value":""}
+				],
+				"subType":"other",
+				"display":"HEATING_ON",
+				"unite":"",
+				"order":"1"
+			},
+			{
+				"_comment": "Commande du plugin Racoon, Eco",
+				"name":"Eco",
+				"eqType":"racoon",
+				"logicalId":"eco",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"		,"value":"filPilote"},
+					{"name":"request"	,"value":"E"}
+				],
+				"template": [
+					{"key":"","value":""}
+				],
+				"subType":"other",
+				"display":"HEATING_OTHER",
+				"unite":"",
+				"order":"2"
+			},
+			{
+				"_comment": "Commande du plugin Racoon, Hors-gel",
+				"name":"Hors Gel",
+				"eqType":"racoon",
+				"logicalId":"horsgel",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"		,"value":"filPilote"},
+					{"name":"request"	,"value":"H"}
+				],
+				"template": [
+					{"key":"","value":""}
+				],
+				"subType":"other",
+				"display":"HEATING_OTHER",
+				"unite":"",
+				"order":"3"
+			},
+			{
+				"_comment": "Commande du plugin Racoon, Arrêt",
+				"name":"Arrêt",
+				"eqType":"racoon",
+				"logicalId":"arret",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"		,"value":"filPilote"},
+					{"name":"request"	,"value":"A"}
+				],
+				"template": [
+					{"key":"","value":""}
+				],
+				"subType":"other",
+				"display":"HEATING_OFF",
+				"unite":"",
+				"order":"4"
+			},
+			{
+				"_comment": "Commande du plugin Racoon, Statut",
+				"name":"Statut",
+				"eqType":"racoon",
+				"logicalId":"statut",
+				"type":"info",
+				"configuration": [
+					{"name":"mode"	,"value":"filPilote"},
+					{"name":"value"	,"value":"A"}
+				],
+				"template": [
+					{"key":"dashboard","value":"label_filpilote"}
+				],
+				"subType":"string",
+				"display":"HEATING_STATE",
+				"unite":"",
+				"order":"5"
+			},
+			{
+				"_comment": "Commande du plugin Racoon, Consigne",
+				"name":"Consigne",
+				"eqType":"racoon",
+				"logicalId":"consigne",
+				"type":"action",
+				"configuration": [
+					{"name":"mode"			,"value":"regulation"},
+					{"name":"request"		,"value":""},
+					{"name":"temperature"	,"value":""},
+					{"name":"ecart"			,"value":""},
+					{"_name":"ki"			,"value":""},
+					{"_name":"kp"			,"value":""},
+					{"_name":"kd"			,"value":""},
+					{"name":"minValue"		,"value":""},
+					{"name":"maxValue"		,"value":""}
+				],
+				"template": [
+					{"key":"dashboard","value":"thermostat"}
+				],
+				"subType":"slider",
+				"display":"TEMPERATURE",
+				"unite":"°C",
+				"order":"6"
+			},
+			{
+				"_comment": "Commande du plugin Racoon, Verrouiller",
+				"name":"Verrouiller",
+				"eqType":"racoon",
+				"logicalId":"verrouiller",
+				"type":"info",
+				"configuration": [
+					{"name":"mode"		,"value":"regulation"}
+				],
+				"template": [
+					{"key":"dashboard","value":"lock"}
+				],
+				"subType":"binary",
+				"display":"THERMOSTAT_LOCK",
+				"unite":"",
+				"order":"7"
+			}
+		],
+	 	"temperature":[
+			{
+				"_comment": "Commande du plugin Racoon, Température",
+				"name":"Température",
+				"eqType":"racoon",
+				"logicalId":"temperature",
+				"type":"info",
+				"configuration": [
+					{"name":"mode"	,"value":"temperature"},
+					{"name":"value"	,"value":""}
+				],
+				"template": [
+					{"key":"","value":""}
+				],
+				"subType":"numeric",
+				"display":"TEMPERATURE",
+				"unite":"°C"
+			}
+		],
+		"teleinfo":[
+			{
+				"_comment" :"exemple Commande teleinfo",
+				"name":"nomCommande",
+				"eqType":"racoon",
+				"logicalId":"nomCommande",
+				"type":"info",
+				"configuration": [
+					{"name":"mode"	,"value":"teleinfo"},
+					{"name":"value"	,"value":""}
+				],
+				"template": [
+					{"key":"dashboard","value":"label_teleinfo"}
+				],
+				"subType":"numeric",
+				"display":"GENERIC",
+				"unite":""
+			}
+		]
+	}
+}

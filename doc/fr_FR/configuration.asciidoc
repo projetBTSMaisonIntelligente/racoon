@@ -17,6 +17,8 @@ image::../images/accessTokenSparkCore.png[]
 
 *Format fichier JSON pour les commandes et objets*
 
-Pour installer les différents objets et leurs commandes, suivre la syntaxe comme sur l'exemple ci-dessous.
+Pour installer les différents objets et leurs commandes, il faut obligatoirement les deux fichiers JSON (equipement.json et commande.json) dans le dossier racoon/core/config/
 
-image::../images/CaptureJSON.PNG[]
+= Retour INDEX =
+
+include::index.asciidoc[]

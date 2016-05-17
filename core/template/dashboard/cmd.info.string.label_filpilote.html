@@ -1,0 +1,29 @@
+<div style="min-width:90px;min-height : 20px;" class="cmd #history# tooltips " data-type="info" data-subtype="numeric" data-cmd_id="#id#" title="#collectDate#">
+
+  <div class="col-xs-6 text-right">
+      <span style="font-weight: bold;font-size : 12px;">#name#</span>
+  </div>
+  
+  <div class="col-xs-6 text-left">
+      <span class="label label-default" style="font-size: 0.7em;">#state#</span>
+ 
+    <script>
+        if ("#state#" == 'Eco') {
+            $('.cmd[data-cmd_id=#id#] span.label').removeClass('label-default').addClass('label-primary');
+        }
+        if ("#state#" == 'Arrêt') {
+            $('.cmd[data-cmd_id=#id#] span.label').removeClass('label-default').addClass('label-danger');
+        }
+        if ("#state#" == 'Confort') {
+            $('.cmd[data-cmd_id=#id#] span.label').removeClass('label-default').addClass('label-success');
+        }
+        if ("#state#" == 'Hors-Gel') {
+            $('.cmd[data-cmd_id=#id#] span.label').removeClass('label-default').addClass('label-info');
+        }   
+        if ("#state#" == 'Délestage') {
+            $('.cmd[data-cmd_id=#id#] span.label').removeClass('label-default').addClass('label-warning');
+        }   
+    </script>
+  </div>  
+    
+</div>

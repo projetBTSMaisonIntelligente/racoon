@@ -1,22 +1,47 @@
 [icon="../images/racoon_icon.png"]
 
-:icons:
+:icon:
 = Racoon =
 
 == Description ==
 
-Plugin Jeedom pour la gestion des radiateurs dans sa maison grâce à des fils pilote contrôlés par un Spark Core.
+Plugin Jeedom pour gérer un Spark Core https://www.particle.io/
 
+De plus, le plugin permet la gestion de zones de radiateur grâce aux fil pilotes, la récupération de téléinformations, la récupération de la température grâce à un programme http://github.com/projetBTSMaisonIntelligente/
 
 === Configuration ===
 
 include::configuration.asciidoc[]
 
+=== Description des erreurs ===
+
+include::erreur.asciidoc[]
+
+== Fonctionnalités ==
+
+=== Gestion d'un Spark Core ===
+
+*Tableau des commandes*
+
+image::../images/SCJeedom.PNG[]
+
+- Variable : Valeur enregistrée sur le Spark Core, elle peut être assigner à une fonctionnalité du programme https://github.com/projetBTSMaisonIntelligente/.
+
+-- Elle peut être récupérer manuellement avec le bouton tester et automatiquement toutes les minutes avec le switch dans le ligne 'Activer Récupération'.
+
+-- La valeur récupérée si la requête a fonctionné est brute, elle est traité si le choix 'utiliser avec' est non-vide et est cohérente avec l'objectif de la fonctionnalité.
+
+- Fonction : Fonction enregistrée sur le Spark Core, elle peut être assigner à une fonctionnalité du programme https://github.com/projetBTSMaisonIntelligente/
+
+-- Elle peut être appeler manuellement via le bouton tester selon les paramètres dans la case prédéfinie.
+
+-- Si le choix 'utiliser avec' est non-vide, la fonction sera utilisé pour les fonctionnalités du programme https://github.com/projetBTSMaisonIntelligente/
+
 === Gestion d'une zone ===
 
 *Tableau des commandes*
 
-image::../images/pageGestionZone.png[]
+image::../images/ZoneJeedom.png[]
 
 - Arrêt : Envoi d'un ordre arrêt dans la zone sélectionnée.
 
@@ -28,10 +53,34 @@ image::../images/pageGestionZone.png[]
 
 - Statut : Permet de récupérer le statut de la zone sélectionnée.
 
+- Consigne : Permet la régulation PID sur la zone sélectionnée selon plusieurs paramètres
+
+-- Capteur : Sélectionner l'équipement Capteur de température pour la gestion de la régulation
+
+-- Température minimum : Permet de déterminer la température minimum de la pièce.
+
+-- Température maximum : Permet de déterminer la température maximum de la pièce.
+
 *Widget*
 
-image::../images/widget.PNG[]
+image::../images/widgetZone.PNG[]
 
-*Scénario*
+=== Gestion des téléinfos === 
+
+image::../images/TeleinfoJeedom.png[]
+
+- Etiquette : Correspond aux valeurs récupérées du compteur EDF.
+
+*Widget*
+
+=== Gestion de la température ===
+
+image::../images/TemperatureJeedom.png[]
+
+- Température : 
+
+*Widget*
+
+== Scénario == 
 
 Possibilité d'associer des capteurs de température avec les zones de radiateur.

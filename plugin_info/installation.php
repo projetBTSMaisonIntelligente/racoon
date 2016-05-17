@@ -15,7 +15,7 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
-
+/**
 function racoon_install() {
     $cron = cron::byClassAndFunction('racoon', 'pull');
     if (!is_object($cron)) {
@@ -48,5 +48,5 @@ function racoon_remove() {
     if (is_object($cron)) {
         $cron->remove();
     }
-}
+}**/
 ?>

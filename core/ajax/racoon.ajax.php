@@ -23,37 +23,31 @@ try {
     if (!isConnect('admin')) {
         throw new Exception(__('401 - Accès non autorisé', __FILE__));
     }
-    /**
-    if (init('action') == 'getracoon') {
-        $racoon = racoon::byId(init('id'));
-        if (!is_object($racoon)) {
-            throw new Exception(__('racoon inconnu verifié l\'id', __FILE__));
-        }
-        $return = utils::o2a($racoon);
-        $return['cmd'] = array();
-        foreach ($racoon->getCmd() as $cmd) {
-            $cmd_info = utils::o2a($cmd);
-            $cmd_info['value'] = $cmd->execCmd(null, 0);
-            $return['cmd'][] = $cmd_info;
-        }
-        ajax::success($return);
-     }**/
-    //Lors de la sauvegarde de la configuration sur la page configuration.php 
-    //Appel de la fonction ajouter objet
-    if (init('action') == 'postSave') {
-        /**
+
+    if (init('action') == 'creationSparkCore') {
+        //log::add('racoon','debug','creationSparkCore()');
         try {
-            racoon::checkConfig();
+            racoon::creationEquipement('sparkCore',1);
+            racoon::getConfigSparkCore();
+
         } catch (Exception $e) {
             ajax::error(displayExeption($e), $e->getCode());
         }
-        **/
-        $return = racoon::creationEquipement();
-        racoonCmd::setIsVisibleCmd();
-        ajax::success($return);
-     }
+        ajax::success('Création de l\'équipement Spark Core réussi');
+    }
+    
+    if (init('action') == 'creationEquipementAnnexe') {
+        try {
+            racoon::creationEquipement('filPilote',7);
+            racoon::creationEquipement('teleinfo',1);
+            racoon::creationEquipement('temperature',1);
+        } catch (Exception $e) {
+            ajax::error(displayExeption($e),$e->getCode());
+        }
+        ajax::success('Création des équipements annexes réussi');
+    }
 
-    throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
+    throw new Exception(__('Aucune methode correspondante à ' . init('action')));
     /*     * *********Catch exeption*************** */
 } catch (Exception $e) {
     ajax::error(displayExeption($e), $e->getCode());

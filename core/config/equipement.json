@@ -1,0 +1,72 @@
+{
+	"equipement": {
+		"sparkCore": {
+			"_comment": "equipement du plugin Racoon, SparkCore",
+			"eqType_name":"racoon",
+			"commande": [
+			
+			],
+			"name":"Spark Core", 
+			"logicalId":"sparkCore",
+			"isEnable":"1",
+			"isUnique":"1",
+			"configuration": [
+				{"name":"typeEquipement"	,"value":"sparkCore"},
+				{"name":"icone"				,"value":"sparkCore"},
+				{"name":"deviceId"			,"value":"NULL"},
+				{"name":"accessToken"		,"value":"NULL"}
+			]
+		},
+		"filPilote": {
+			"_comment": "equipement du plugin Racoon, Zone",
+			"eqType_name":"racoon",
+			"commande": [
+				{"name":"confort"},
+				{"name":"eco"},
+				{"name":"horsGel"},
+				{"name":"arret"},
+				{"name":"statut"}
+			],
+			"name":"Zone", 
+			"logicalId":"zone",
+			"isEnable":"0",
+			"isUnique":"0",
+			"configuration": [
+				{"name":"typeEquipement"	,"value":"filPilote"},
+				{"name":"zone"				,"value":"variableINbEqui"},
+				{"name":"icone"				,"value":"radiateur"}
+			]
+		},
+		"teleinfo": {
+			"_comment": "equipement du plugin Racoon, Teleinfo",
+			"eqType_name":"racoon",
+			"commande": [
+			],
+			"name":"Téléinfo", 
+			"logicalId":"teleinfo",
+			"isEnable":"0",
+			"isUnique":"1",
+			"configuration": [
+				{"name":"typeEquipement"	,"value":"teleinfo"},
+				{"name":"icone"				,"value":"compteur"}
+			]
+		},
+		"temperature": {
+			"_comment": "equipement du plugin Racoon, Température",
+			"eqType_name":"racoon",
+			"commande": [
+				{"name" : "Valeur"}
+			],
+			"name":"Température", 
+			"logicalId":"temperature",
+			"isEnable":"0",
+			"isUnique":"1",
+			"configuration": [
+				{"name":"typeEquipement"	,"value":"temperature"},
+				{"name":"icone"				,"value":"temperature"}
+
+			]
+		}
+	}
+}
+	
