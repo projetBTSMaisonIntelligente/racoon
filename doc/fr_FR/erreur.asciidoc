@@ -3,6 +3,7 @@
 Liste des erreurs possibles sur le log de Jeedom
 
 === [ERROR][Requête] === 
+<<<<<<< HEAD
 
 La requête HTTP vers le Spark Core n'est réussi, le code d'erreur et la source disponible sur le log permettent de voir le soucis.
 
@@ -12,6 +13,16 @@ Les fichiers JSON ne sont pas conformes.
 
 Code d'erreur JSON
 
+=======
+La requête HTTP vers le Spark Core n'est réussi, le code d'erreur et la source disponible sur le log permettent de voir le soucis.
+
+Par exemple, l'accesToken
+
+=== [ERROR][JSON] ===
+
+Les fichiers JSON ne sont pas conformes
+Code d'erreur JSON
+>>>>>>> origin/master
 |=======================================================================================================
 |Constante 					|Signification
 |0 JSON_ERROR_NONE        	|Aucune erreur n'est survenue
@@ -30,23 +41,32 @@ Un equipement est manquant pour le fonctionnement du plugin, pour réparer ceci 
 === [ERROR][Fichier] ===
 
 Le dossier racoon/core/config contient deux fichiers JSON, equipement.json et commande.json.
+<<<<<<< HEAD
 
 Ces deux fichiers ne doivent pas être modifés.
 
+=======
+Ces deux fichiers ne doivent pas être modifés.
+>>>>>>> origin/master
 Pour les récupérer, voir https://github.com/projetBTSMaisonIntelligente/racoon/tree/master/core/config
 
 === [ERROR][Config] ===
 
 Les données de configuration des équipements et commandes n'ont pas été récupéré.
+<<<<<<< HEAD
 
 Soit sur la page de configuration, Device ID et accessToken du Spark Core n'ont pas été rempli et/ou enregistré
 
+=======
+Soit sur la page de configuration, Device ID et accessToken du Spark Core n'ont pas été rempli et/ou enregistré
+>>>>>>> origin/master
 Soit les fichiers JSON de config ne sont pas utilisables pour la création des racoon et racoonCmd
 
 === [ERROR][Paramètres] ===
 
 Les paramètres de la méthode ne sont pas conformes, activer les logs DEBUG dans les options JEEDOM pour voir l'appel des méthodes et ses paramètres
 
+<<<<<<< HEAD
 === [ERROR][Traitement] === 
 
 Le résultat de la requête sur le Spark Core n'est pas compatible avec le type de traitement à effectuer 
@@ -62,3 +82,12 @@ Le résultat de la requête sur le Spark Core n'est pas compatible avec le type 
 = Retour INDEX =
 
 include::index.asciidoc[]
+=======
+===[ERROR][Traitement] === 
+
+Le résultat de la requête sur le Spark Core n'est pas compatible avec le type de traitement à effectuer 
+Informations : correspond à un array sous la forme 
+Fil Pilote : correspond à un string de 7 caractères qui sont soit 'A' pour arrêt 'C' pour confort 'H' pour hors-gel 'E' pour économique 'D' pour délestage
+Teleinfo : correspond à un string sous forme JSON {"ADCO":16161,"ptec":12,"iisnt":""}
+Température : correspond à un double récupéré depuis le récepteur 433Mhz du Spark Core d'une température
+>>>>>>> origin/master

@@ -55,9 +55,15 @@ function addCmdToTable(_cmd) {
                      tr += '<a class="btn btn-default" id="bt_searchVariableTemperature"><i class="fa fa-list-alt"></i></a>'
                      tr += '</span>'
                      tr += '</div>'
+<<<<<<< HEAD
                     //tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="kp" style="height : 33px" placeholder="{{Coefficient }}" ></input>';
                     //tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="ki" style="height : 33px" placeholder="{{Coefficient}}"></input>';
                     //tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="kd" style="height : 33px" placeholder="{{Coefficient}}"></input>';
+=======
+                    tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="kp" style="height : 33px" placeholder="{{Coefficient }}" ></input>';
+                    tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="ki" style="height : 33px" placeholder="{{Coefficient}}"></input>';
+                    tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="kd" style="height : 33px" placeholder="{{Coefficient}}"></input>';
+>>>>>>> origin/master
                     tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" style="height : 33px" placeholder="{{Température minimum}}"></input>';
                     tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" style="height : 33px" placeholder="{{Température maximum}}"></input>';
                 }

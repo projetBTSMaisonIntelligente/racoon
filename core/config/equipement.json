@@ -12,20 +12,34 @@
 			"isUnique":"1",
 			"configuration": [
 				{"name":"typeEquipement"	,"value":"sparkCore"},
+<<<<<<< HEAD
 				{"name":"icone"				,"value":"sparkCore"},
 				{"name":"deviceId"			,"value":"NULL"},
 				{"name":"accessToken"		,"value":"NULL"}
+=======
+				{"name":"icone"		,"value":"sparkCore"},
+				{"name":"deviceId"		,"value":"NULL"},
+				{"name":"accessToken"	,"value":"NULL"}
+>>>>>>> origin/master
 			]
 		},
 		"filPilote": {
 			"_comment": "equipement du plugin Racoon, Zone",
 			"eqType_name":"racoon",
 			"commande": [
+<<<<<<< HEAD
 				{"name":"confort"},
 				{"name":"eco"},
 				{"name":"horsGel"},
 				{"name":"arret"},
 				{"name":"statut"}
+=======
+				{"name":"confort"	,"num":"0"},
+				{"name":"eco"		,"num":"1"},
+				{"name":"horsGel"	,"num":"2"},
+				{"name":"arret"	,"num":"3"},
+				{"name":"statut"	,"num":"4"}
+>>>>>>> origin/master
 			],
 			"name":"Zone", 
 			"logicalId":"zone",
@@ -33,8 +47,13 @@
 			"isUnique":"0",
 			"configuration": [
 				{"name":"typeEquipement"	,"value":"filPilote"},
+<<<<<<< HEAD
 				{"name":"zone"				,"value":"variableINbEqui"},
 				{"name":"icone"				,"value":"radiateur"}
+=======
+				{"name":"zone"		,"value":"variableINbEqui"},
+				{"name":"icone"		,"value":"radiateur"}
+>>>>>>> origin/master
 			]
 		},
 		"teleinfo": {
@@ -48,14 +67,22 @@
 			"isUnique":"1",
 			"configuration": [
 				{"name":"typeEquipement"	,"value":"teleinfo"},
+<<<<<<< HEAD
 				{"name":"icone"				,"value":"compteur"}
+=======
+				{"name":"icone"		,"value":"compteur"}
+>>>>>>> origin/master
 			]
 		},
 		"temperature": {
 			"_comment": "equipement du plugin Racoon, Température",
 			"eqType_name":"racoon",
 			"commande": [
+<<<<<<< HEAD
 				{"name" : "Valeur"}
+=======
+				{"name" : "Valeur"	,"num":"5"}
+>>>>>>> origin/master
 			],
 			"name":"Température", 
 			"logicalId":"temperature",
@@ -63,7 +90,11 @@
 			"isUnique":"1",
 			"configuration": [
 				{"name":"typeEquipement"	,"value":"temperature"},
+<<<<<<< HEAD
 				{"name":"icone"				,"value":"temperature"}
+=======
+				{"name":"icone"		,"value":"temperature"}
+>>>>>>> origin/master
 
 			]
 		}
