@@ -71,10 +71,6 @@ Le résultat de la requête sur le Spark Core n'est pas compatible avec le type 
 
 - Température : correspond à un double récupéré depuis le récepteur 433Mhz du Spark Core d'une température
 
-= Retour INDEX =
-
-include::index.asciidoc[]
-
 === [ERROR][Traitement] === 
 
 Le résultat de la requête sur le Spark Core n'est pas compatible avec le type de traitement à effectuer 
@@ -82,7 +78,7 @@ Informations : correspond à un array sous la forme
 Fil Pilote : correspond à un string de 7 caractères qui sont soit 'A' pour arrêt 'C' pour confort 'H' pour hors-gel 'E' pour économique 'D' pour délestage
 Teleinfo : correspond à un string sous forme JSON {"ADCO":16161,"ptec":12,"iisnt":""}
 
-===[ERROR][FonctionSparkCore] === 
+=== [ERROR][FonctionSparkCore] === 
 .Fonction Spark Core
 
 SUCCES 0
@@ -103,3 +99,7 @@ FP_INCORRECT 1
 
 - CONSIGNE_IMPROBABLE 3
  
+= Retour INDEX =
+
+include::index.asciidoc[]
+

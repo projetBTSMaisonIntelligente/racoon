@@ -13,12 +13,10 @@
 					{"name":"aRecuperer"	,"value":false},
 					{"name":"value" 		,"value":""}
 				],
-<<<<<<< HEAD
 				"template": [
 					{"key":"","value":""}
 				],
-=======
->>>>>>> origin/master
+
 				"subType":"string",
 				"display":"GENERIC",
 				"unite":""
@@ -32,7 +30,6 @@
 				"logicalId":"nomCommande",
 				"type":"action",
 				"configuration": [
-<<<<<<< HEAD
 					{"name":"mode"			,"value":"sparkCore"},
 					{"name":"aUtiliser"		,"value":false},
 					{"name":"utiliserPar"	,"value":""},
@@ -40,12 +37,10 @@
 				],
 				"template": [
 					{"key":"","value":""}
-=======
 					{"name":"mode"	,"value":"sparkCore"},
 					{"name":"aUtiliser"	,"value":false},
 					{"name":"utiliserPar"	,"value":""},
 					{"name":"parametre" ,"value":""}
->>>>>>> origin/master
 				],
 				"subType":"other",
 				"display":"MODE_SET_STATE",
@@ -63,7 +58,6 @@
 					{"name":"mode"		,"value":"filPilote"},
 					{"name":"request"	,"value":"C"}
 				],
-<<<<<<< HEAD
 				"template": [
 					{"key":"","value":""}
 				],
@@ -71,11 +65,9 @@
 				"display":"HEATING_ON",
 				"unite":"",
 				"order":"1"
-=======
 				"subType":"other",
 				"display":"HEATING_ON",
 				"unite":""
->>>>>>> origin/master
 			},
 			{
 				"_comment": "Commande du plugin Racoon, Eco",
@@ -84,7 +76,6 @@
 				"logicalId":"eco",
 				"type":"action",
 				"configuration": [
-<<<<<<< HEAD
 					{"name":"mode"		,"value":"filPilote"},
 					{"name":"request"	,"value":"E"}
 				],
@@ -95,14 +86,12 @@
 				"display":"HEATING_OTHER",
 				"unite":"",
 				"order":"2"
-=======
 					{"name":"mode"	,"value":"filPilote"},
 					{"name":"request"	,"value":"E"}
 				],
 				"subType":"other",
 				"display":"HEATING_OTHER",
 				"unite":""
->>>>>>> origin/master
 			},
 			{
 				"_comment": "Commande du plugin Racoon, Hors-gel",
@@ -111,7 +100,6 @@
 				"logicalId":"horsgel",
 				"type":"action",
 				"configuration": [
-<<<<<<< HEAD
 					{"name":"mode"		,"value":"filPilote"},
 					{"name":"request"	,"value":"H"}
 				],
@@ -122,14 +110,12 @@
 				"display":"HEATING_OTHER",
 				"unite":"",
 				"order":"3"
-=======
 					{"name":"mode"	,"value":"filPilote"},
 					{"name":"request"	,"value":"H"}
 				],
 				"subType":"other",
 				"display":"HEATING_OTHER",
 				"unite":""
->>>>>>> origin/master
 			},
 			{
 				"_comment": "Commande du plugin Racoon, Arrêt",
@@ -138,7 +124,6 @@
 				"logicalId":"arret",
 				"type":"action",
 				"configuration": [
-<<<<<<< HEAD
 					{"name":"mode"		,"value":"filPilote"},
 					{"name":"request"	,"value":"A"}
 				],
@@ -149,14 +134,12 @@
 				"display":"HEATING_OFF",
 				"unite":"",
 				"order":"4"
-=======
 					{"name":"mode"	,"value":"filPilote"},
 					{"name":"request"	,"value":"A"}
 				],
 				"subType":"other",
 				"display":"HEATING_OFF",
 				"unite":""
->>>>>>> origin/master
 			},
 			{
 				"_comment": "Commande du plugin Racoon, Statut",
@@ -168,7 +151,6 @@
 					{"name":"mode"	,"value":"filPilote"},
 					{"name":"value"	,"value":"A"}
 				],
-<<<<<<< HEAD
 				"template": [
 					{"key":"dashboard","value":"label_filpilote"}
 				],
@@ -176,11 +158,9 @@
 				"display":"HEATING_STATE",
 				"unite":"",
 				"order":"5"
-=======
 				"subType":"string",
 				"display":"HEATING_STATE",
 				"unite":""
->>>>>>> origin/master
 			},
 			{
 				"_comment": "Commande du plugin Racoon, Consigne",
@@ -189,7 +169,6 @@
 				"logicalId":"consigne",
 				"type":"action",
 				"configuration": [
-<<<<<<< HEAD
 					{"name":"mode"			,"value":"regulation"},
 					{"name":"request"		,"value":""},
 					{"name":"temperature"	,"value":""},
@@ -224,7 +203,6 @@
 				"display":"THERMOSTAT_LOCK",
 				"unite":"",
 				"order":"7"
-=======
 					{"name":"mode"	,"value":"regulation"},
 					{"name":"request"	,"value":""},
 					{"name":"ki"	,"value":""},
@@ -236,7 +214,6 @@
 				"subType":"slider",
 				"display":"TEMPERATURE",
 				"unite":"°C"
->>>>>>> origin/master
 			}
 		],
 	 	"temperature":[
@@ -250,12 +227,9 @@
 					{"name":"mode"	,"value":"temperature"},
 					{"name":"value"	,"value":""}
 				],
-<<<<<<< HEAD
 				"template": [
 					{"key":"","value":""}
 				],
-=======
->>>>>>> origin/master
 				"subType":"numeric",
 				"display":"TEMPERATURE",
 				"unite":"°C"
@@ -272,12 +246,9 @@
 					{"name":"mode"	,"value":"teleinfo"},
 					{"name":"value"	,"value":""}
 				],
-<<<<<<< HEAD
 				"template": [
 					{"key":"dashboard","value":"label_teleinfo"}
 				],
-=======
->>>>>>> origin/master
 				"subType":"numeric",
 				"display":"GENERIC",
 				"unite":""
