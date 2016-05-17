@@ -6,14 +6,14 @@ Pour le Spark Core, voici la documentation du constructeur pour l'installation d
 
 *Page de configuration*
 
-image::../images/pageConfig.PNG[]
+image::../images/documentation/pageConfig.PNG[]
 
 - Device ID du Spark Core : Identifiant de l'appareil accessible sur https://build.particle.io/build/[Particle Build].
 
 - Token d'accès du Spark Core : Clé d'accès à l'appareil accessible sur https://build.particle.io/build/[Particle Build].
 
-image::../images/idSparkCore.png[]
-image::../images/accessTokenSparkCore.png[]
+image::../images/documentation/idSparkCore.png[]
+image::../images/documentation/accessTokenSparkCore.png[]
 
 *Format fichier JSON pour les commandes et objets*
 
