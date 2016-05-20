@@ -15,9 +15,6 @@
 				{"name":"icone"				,"value":"sparkCore"},
 				{"name":"deviceId"			,"value":"NULL"},
 				{"name":"accessToken"		,"value":"NULL"}
-				{"name":"icone"		,"value":"sparkCore"},
-				{"name":"deviceId"		,"value":"NULL"},
-				{"name":"accessToken"	,"value":"NULL"}
 			]
 		},
 		"filPilote": {
@@ -29,11 +26,6 @@
 				{"name":"horsGel"},
 				{"name":"arret"},
 				{"name":"statut"}
-				{"name":"confort"	,"num":"0"},
-				{"name":"eco"		,"num":"1"},
-				{"name":"horsGel"	,"num":"2"},
-				{"name":"arret"	,"num":"3"},
-				{"name":"statut"	,"num":"4"}
 			],
 			"name":"Zone", 
 			"logicalId":"zone",
@@ -43,8 +35,6 @@
 				{"name":"typeEquipement"	,"value":"filPilote"},
 				{"name":"zone"				,"value":"variableINbEqui"},
 				{"name":"icone"				,"value":"radiateur"}
-				{"name":"zone"		,"value":"variableINbEqui"},
-				{"name":"icone"		,"value":"radiateur"}
 			]
 		},
 		"teleinfo": {
@@ -59,7 +49,6 @@
 			"configuration": [
 				{"name":"typeEquipement"	,"value":"teleinfo"},
 				{"name":"icone"				,"value":"compteur"}
-				{"name":"icone"		,"value":"compteur"}
 			]
 		},
 		"temperature": {
@@ -67,7 +56,6 @@
 			"eqType_name":"racoon",
 			"commande": [
 				{"name" : "Valeur"}
-				{"name" : "Valeur"	,"num":"5"}
 			],
 			"name":"Température", 
 			"logicalId":"temperature",
@@ -76,7 +64,6 @@
 			"configuration": [
 				{"name":"typeEquipement"	,"value":"temperature"},
 				{"name":"icone"				,"value":"temperature"}
-				{"name":"icone"		,"value":"temperature"}
 
 			]
 		}

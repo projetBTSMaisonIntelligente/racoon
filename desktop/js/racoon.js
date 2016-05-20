@@ -20,10 +20,10 @@ $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder:
  * Fonction pour l'ajout de commande, appellé automatiquement par plugin.template
  */
 function variableSparkCore() {
-
+    var _cmdVariableSparkCore = {configuration: {}};
 }
 function fonctionSparkCore() {
-
+    var _cmdFonctionSparkCore = {configuration: {}};
 }
 function cmdAction() {
 
@@ -31,7 +31,7 @@ function cmdAction() {
 function cmdInfo() {
 
 }
-function cmdConsigne {
+function cmdConsigne() {
 
 }
     
@@ -71,9 +71,6 @@ function addCmdToTable(_cmd) {
                     //tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="kp" style="height : 33px" placeholder="{{Coefficient }}" ></input>';
                     //tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="ki" style="height : 33px" placeholder="{{Coefficient}}"></input>';
                     //tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="kd" style="height : 33px" placeholder="{{Coefficient}}"></input>';
-                    tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="kp" style="height : 33px" placeholder="{{Coefficient }}" ></input>';
-                    tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="ki" style="height : 33px" placeholder="{{Coefficient}}"></input>';
-                    tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="kd" style="height : 33px" placeholder="{{Coefficient}}"></input>';
                     tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" style="height : 33px" placeholder="{{Température minimum}}"></input>';
                     tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" style="height : 33px" placeholder="{{Température maximum}}"></input>';
                 }

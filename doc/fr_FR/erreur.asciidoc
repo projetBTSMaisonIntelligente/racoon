@@ -1,4 +1,4 @@
-= Description des plugins =
+= Description des erreurs =
 
 == Liste des erreurs possibles sur le log de Jeedom ==
 
