@@ -7,3 +7,7 @@
 - Dans la page "Gestion des plugins", sélectionner "Ajouter un plugin" et le dossier ZIP racoon.
 
 - F5 pour rafraichir la page et accèder ensuite à la page de configuration via l'icône racoon.
+
+= Retour INDEX =
+
+include::index.asciidoc[]

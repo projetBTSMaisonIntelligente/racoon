@@ -73,14 +73,6 @@ image::../images/documentation/TeleinfoJeedom.PNG[]
 
 *Widget*
 
-=== Gestion de la température ===
-
-image::../images/documentation/TemperatureJeedom.PNG[]
-
-.Température : 
-
-*Widget*
-
 == Scénario == 
 
 Possibilité d'associer des capteurs de température avec les zones de radiateur.

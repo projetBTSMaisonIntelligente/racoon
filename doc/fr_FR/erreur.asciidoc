@@ -14,23 +14,21 @@ Code d'erreur JSON
 
 La requête HTTP vers le Spark Core n'est réussi, le code d'erreur et la source disponible sur le log permettent de voir le soucis.
 
-Par exemple, l'accesToken
-
 === [ERROR][JSON] ===
 
 Les fichiers JSON ne sont pas conformes
 
 .Code d'erreur JSON
 
-|=======================================================================================================
+|=============================================================================
 |Constante 					|Signification
-|0 JSON_ERROR_NONE        	|Aucune erreur n'est survenue
-|1 JSON_ERROR_DEPTH        	|La profondeur maximale de la pile a été atteinte
-|2 JSON_ERROR_STATE_MISMATCH|JSON invalide ou mal formé     	
-|3 JSON_ERROR_CTRL_CHAR		|Erreur lors du contrôle des caractères ; probablement un encodage incorrect
-|4 JSON_ERROR_SYNTAX   		|Erreur de syntaxe
+|0 JSON_ERROR_NONE        			|Aucune erreur n'est survenue
+|1 JSON_ERROR_DEPTH        			|La profondeur maximale de la pile a été atteinte
+|2 JSON_ERROR_STATE_MISMATCH		|JSON invalide ou mal formé     	
+|3 JSON_ERROR_CTRL_CHAR			|Erreur lors du contrôle des caractères ; probablement un encodage incorrect
+|4 JSON_ERROR_SYNTAX   			|Erreur de syntaxe
 |5 JSON_ERROR_UTF8			|Caractères UTF-8 malformés, possiblement mal encodés
-|=======================================================================================================
+|=============================================================================
 Pour plus d'informations, voir https://secure.php.net/manual/fr/function.json-last-error.php
 
 === [ERROR][Equipement] ===
@@ -71,14 +69,8 @@ Le résultat de la requête sur le Spark Core n'est pas compatible avec le type 
 
 - Température : correspond à un double récupéré depuis le récepteur 433Mhz du Spark Core d'une température
 
-=== [ERROR][Traitement] === 
-
-Le résultat de la requête sur le Spark Core n'est pas compatible avec le type de traitement à effectuer 
-Informations : correspond à un array sous la forme 
-Fil Pilote : correspond à un string de 7 caractères qui sont soit 'A' pour arrêt 'C' pour confort 'H' pour hors-gel 'E' pour économique 'D' pour délestage
-Teleinfo : correspond à un string sous forme JSON {"ADCO":16161,"ptec":12,"iisnt":""}
-
 === [ERROR][FonctionSparkCore] === 
+
 .Fonction Spark Core
 
 SUCCES 0
