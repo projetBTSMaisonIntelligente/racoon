@@ -91,7 +91,7 @@ public static function cron() {
 //  Méthodes des créations des eqLogics et commandes
 /////////////////////////////////////////////////////////////////////////
   /**
-     * Ajout de tous les objets du plugin appelé après la sauvegarde de la configuration
+     * Ajout de tous les objets du plugin
      *
      * @param string $typeEquipement Correspond au type de d'équipement à créer.
      *
@@ -716,20 +716,13 @@ public static function supprimerCommandeSparkCore($variables,$fonctions) {
      *
      * @param double $temperature Variable correspond à la valeur d'un capteur de température
      *
-     * @param double $kp Coefficient pour la régulation PID
-     *
-     * @param double $ki Coefficient pour la régulation PID
-     *
-     * @param double $kd Coefficient pour la régulation PID
-     *
      * @return boolean $resultat retourne TRUE si ça marche / FALSE si ça ne marche pas + message log. 
      *
      */
-    public static function setRegulation($zone,$request,$temperature/**,$kp,$ki,$kd,$tempMin,$tempMax**/) {
+    public static function setRegulation($zone,$request,$temperature) {
       log::add('racoon','DEBUG','-----------------------------------------------------------------');
       log::add('racoon','DEBUG','[Appel] de setRegulation() avec les paramètres, zone ' . $zone . ' ,consigne ' . $request . ' ,temperature ' . $temperature);
-      if(isset($zone) && isset($request) && isset($temperature)/**&& is_double($kp) && is_double($ki) && is_double($kd)**/) {
-        //  $parametre = '(' . $zone . '/' . $request . '/' . $temperature . '/' . $kp . '/' . $ki . '/' . $kd .'/'. $tempMin .'/'. $temMax . ')';
+      if(isset($zone) && isset($request) && isset($temperature)) {
         $ecart = 0.5;
         $parametre = '(' . $zone . '/' . $request . '/' . $temperature . '/' . $ecart . '/)';
         $fonctionSparkCore = self::selectionFonctionSparkCore('regulation');
@@ -750,7 +743,14 @@ public static function supprimerCommandeSparkCore($variables,$fonctions) {
       log::add('racoon','DEBUG','-----------------------------------------------------------------');
       return $resultat;
     }
-  
+  	/**
+     * Récupère la bonne fonction du Spark Core pour les set (FilPilote et Regulation)
+     *
+     * @param string $fonctionnalite Correspond à la fonctionnalite que la fonction set a besoin
+     *
+     * @return string $resultat retourne nomFonction si ça marche / FALSE si ça ne marche pas + message log. 
+     *
+     */
    public static function selectionFonctionSparkCore($fonctionnalite) {
     log::add('racoon','DEBUG','-----------------------------------------------------------------');
     log::add('racoon','DEBUG','[Appel] de selectionFonctionSparkCore() avec le paramètre, fonctionnalité : ' . $fonctionnalite);
@@ -781,7 +781,14 @@ public static function supprimerCommandeSparkCore($variables,$fonctions) {
     log::add('racoon','DEBUG','-----------------------------------------------------------------');
     return $resultat;
    }
-
+	/**
+     * Permet la traduction des caractères reçues de la variable enregistrant les états des fil pilote
+     *
+     * @param string $lettreStatut lettre de l'état du fil pilote
+     *
+     * @return string $resultat retourne nomStatut si ça marche / FALSE si ça ne marche pas + message log. 
+     *
+     */
    public static function nomStatutFilPilote($lettreStatut) {
     log::add('racoon','DEBUG','-----------------------------------------------------------------');
     log::add('racoon','DEBUG','[Appel] de nomStatutFilPilote() avec le paramètre, lettreStatut : ' . $lettreStatut);
