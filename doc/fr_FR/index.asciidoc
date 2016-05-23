@@ -1,13 +1,11 @@
-[icon="../images/racoon_icon.png"]
-
-:icon:
+image::../images/racoon_icon.png[]
 = Racoon =
 
 == Description ==
 
 Plugin Jeedom pour gérer un Spark Core https://www.particle.io/
 
-De plus, le plugin permet la gestion de zones de radiateur grâce aux fil pilotes, la récupération de téléinformations, la récupération de la température grâce à un programme http://github.com/projetBTSMaisonIntelligente/
+De plus, le plugin permet la gestion de zones de radiateur grâce aux fil pilotes, la récupération de téléinformations, la récupération de la température grâce à un programme http://github.com/projetBTSMaisonIntelligente/sweetHome
 
 === Configuration ===
 
@@ -25,17 +23,17 @@ include::erreur.asciidoc[]
 
 image::../images/documentation/SCJeedom.PNG[]
 
-.Variable : Valeur enregistrée sur le Spark Core, elle peut être assigner à une fonctionnalité du programme https://github.com/projetBTSMaisonIntelligente/.
+.Variable : Valeur enregistrée sur le Spark Core, elle peut être assigner à une fonctionnalité du programme. https://github.com/projetBTSMaisonIntelligente/sweetHome
 
 - Elle peut être récupérer manuellement avec le bouton tester et automatiquement toutes les minutes avec le switch dans le ligne 'Activer Récupération'.
 
 - La valeur récupérée si la requête a fonctionné est brute, elle est traité si le choix 'utiliser avec' est non-vide et est cohérente avec l'objectif de la fonctionnalité.
 
-.Fonction : Fonction enregistrée sur le Spark Core, elle peut être assigner à une fonctionnalité du programme https://github.com/projetBTSMaisonIntelligente/
+.Fonction : Fonction enregistrée sur le Spark Core, elle peut être assigner à une fonctionnalité du programme. https://github.com/projetBTSMaisonIntelligente/sweetHome
 
 - Elle peut être appeler manuellement via le bouton tester selon les paramètres dans la case prédéfinie.
 
-- Si le choix 'utiliser avec' est non-vide, la fonction sera utilisé pour les fonctionnalités du programme https://github.com/projetBTSMaisonIntelligente/
+- Si le choix 'utiliser avec' est non-vide, la fonction sera utilisé pour les fonctionnalités du programme. https://github.com/projetBTSMaisonIntelligente/
 
 === Gestion d'une zone ===
 
@@ -53,9 +51,9 @@ image::../images/documentation/ZoneJeedom.png[]
 
 .Statut : Permet de récupérer le statut de la zone sélectionnée.
 
-.Consigne : Permet la régulation PID sur la zone sélectionnée selon plusieurs paramètres
+.Consigne : Permet une régulation de la température sur la zone sélectionnée.
 
-- Capteur : Sélectionner l'équipement Capteur de température pour la gestion de la régulation
+- Capteur : Sélectionner l'équipement Capteur de température pour la gestion de la régulation.
 
 - Température minimum : Permet de déterminer la température minimum de la pièce.
 
