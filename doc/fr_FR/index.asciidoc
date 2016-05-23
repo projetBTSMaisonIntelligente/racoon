@@ -1,4 +1,4 @@
-image::../images/racoon_icon.png[]
+image::../images/racoon_icon.png[align="center",width="200", height="200"]
 = Racoon =
 
 == Description ==

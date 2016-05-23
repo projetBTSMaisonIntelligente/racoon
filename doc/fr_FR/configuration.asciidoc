@@ -12,8 +12,8 @@ image::../images/documentation/pageConfig.PNG[]
 
 - Token d'accès du Spark Core : Clé d'accès à l'appareil accessible sur https://build.particle.io/build/[Particle Build].
 
-image::../images/documentation/idSparkCore.png[]
-image::../images/documentation/accessTokenSparkCore.png[]
+image::../images/documentation/idSparkCore.png[width="300", height="200",role="left"] 
+image::../images/documentation/accessTokenSparkCore.png[width="300", height="200",role="center"]
 
 *Format fichier JSON pour les commandes et objets*
 
