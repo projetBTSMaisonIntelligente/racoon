@@ -1,0 +1,67 @@
+<script src="plugins/racoon/core/template/dashboard/cmd.action.slider.knob/jquery.knob.js"></script>
+<div class="cmd cmd-widget" data-type="action" data-subtype="slider" data-cmd_id="#id#" style="width : 100px;height : 110px;">
+    <div class='cmdName' style="font-size : 14px;overflow: hidden;" title="#name#">#name#</div>
+  <div style="color : #ffffff; font-size: 12 px;" data-cmd_id="#id#">
+ 
+  		<input class="knob" data-width="80" data-inputColor="#ffffff#" data-height="80" data-angleOffset=-125 data-angleArc=250 data-min="#minValue#" data-max="#maxValue#" data-fgColor="#00bcfb"  data-thickness="0.15" value="#state#"> 
+  </div>
+  
+    <script>
+      
+     $(function($) {
+
+                $(".cmd[data-cmd_id=#id#] .knob").knob({
+                    change : function (value) {
+                        //console.log("change : " + value);
+                    },
+                    release : function(v) {
+                        jeedom.cmd.execute({id :'#id#',value : {slider: v}});
+                    },
+                    cancel : function () {
+                        console.log("cancel : ", this);
+                    },
+                    format : function (value) {
+                        return value + '#unite#';
+                    }, 
+                    draw : function () {
+
+                        // "tron" case
+                        if(this.$.data('skin') == 'tron') {
+
+                            this.cursorExt = 0.3;
+
+                            var a = this.arc(this.cv)  // Arc
+                                , pa                   // Previous arc
+                                , r = 1;
+
+                            this.g.lineWidth = this.lineWidth;
+
+                            if (this.o.displayPrevious) {
+                                pa = this.arc(this.v);
+                                this.g.beginPath();
+                                this.g.strokeStyle = this.pColor;
+                                this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, pa.s, pa.e, pa.d);
+                                this.g.stroke();
+                            }
+
+                            this.g.beginPath();
+                            this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
+                            this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, a.s, a.e, a.d);
+                            this.g.stroke();
+
+                            this.g.lineWidth = 2;
+                            this.g.beginPath();
+                            this.g.strokeStyle = this.o.fgColor;
+                            this.g.arc( this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+                            this.g.stroke();
+
+                            return false;
+                        }
+                    }
+                });
+
+
+            });
+    </script>
+
+</div>

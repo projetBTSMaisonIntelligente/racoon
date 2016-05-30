@@ -151,7 +151,7 @@
 					{"name":"maxValue"		,"value":""}
 				],
 				"template": [
-					{"key":"dashboard","value":"thermostat"}
+					{"key":"dashboard","value":"knob"}
 				],
 				"subType":"slider",
 				"display":"TEMPERATURE",

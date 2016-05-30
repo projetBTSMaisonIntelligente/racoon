@@ -232,7 +232,7 @@ public static function creationEquipement($typeEquipement,$nombreEquipement) {
   public static function getConfigJSON($element) {
       log::add('racoon','DEBUG','-----------------------------------------------------------------');
       log::add('racoon','DEBUG','[Appel] getConfigJSON avec le paramètre, fichier : ' . $element);
-        if(file_get_contents(self::CHEMIN_FICHIERJSON . $element . '.json') == FALSE) {
+      if(file_get_contents(self::CHEMIN_FICHIERJSON . $element . '.json') == FALSE) {
             log::add('racoon','ERROR','[Fichier] ' . $element . '.json introuvable');
             $resultat = false;
         } else {
@@ -257,14 +257,14 @@ public static function creationEquipement($typeEquipement,$nombreEquipement) {
                     break;
               }
             }
-        }
-        if(empty($resultat))
-          $resultatLog = "ERROR";
-        else 
-          $resultatLog = print_r($resultat,true);
-        log::add('racoon','DEBUG','Valeur de retour de la méthode getConfigJSON : ' . $resultatLog);
-        log::add('racoon','DEBUG','-----------------------------------------------------------------');
-        return $resultat;
+      }
+      if(empty($resultat))
+        $resultatLog = "ERROR";
+      else 
+        $resultatLog = print_r($resultat,true);
+      log::add('racoon','DEBUG','Valeur de retour de la méthode getConfigJSON : ' . $resultatLog);
+      log::add('racoon','DEBUG','-----------------------------------------------------------------');
+      return $resultat;
   }
  /**
      * Récupération à partir de la page de configuration, des informations sur le Spark Core.
@@ -724,7 +724,7 @@ public static function supprimerCommandeSparkCore($variables,$fonctions) {
       log::add('racoon','DEBUG','[Appel] de setRegulation() avec les paramètres, zone ' . $zone . ' ,consigne ' . $request . ' ,temperature ' . $temperature);
       if(isset($zone) && isset($request) && isset($temperature)) {
         $ecart = 0.5;
-        $parametre = '(' . $zone . '/' . $request . '/' . $temperature . '/' . $ecart . '/)';
+        $parametre = '(' . $zone . '/' . $request . '/' . $temperature . '/)';
         $fonctionSparkCore = self::selectionFonctionSparkCore('regulation');
         if(isset($fonctionSparkCore)){
           if(self::requeteFonctionSparkCore($fonctionSparkCore,$parametre))
