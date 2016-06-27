@@ -26,8 +26,6 @@ if(!class_exists("ParticleAPI"))
 /**
      * Class racoon : eqLogic Racoon
      *
-     * @author Simon Desnoë <sdesnoe@gmail.com>
-     *
      * @see https://www.jeedom.com/doc/documentation/code/classes/eqLogic.html Documentation de la Classe eqLogic
      *
      * @version 1.1
@@ -861,8 +859,6 @@ public static function supprimerCommandeSparkCore($variables,$fonctions) {
 
 /**
      * Class racoonCmd : Commande des eqLogics Racoon 
-     *
-     * @author Simon Desnoë <sdesnoe@gmail.com>
      *
      * @see https://www.jeedom.com/doc/documentation/code/classes/cmd.html Documentation de la Classe cmd
      *
